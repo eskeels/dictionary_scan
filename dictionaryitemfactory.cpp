@@ -5,9 +5,9 @@ namespace DLP {
 DictionaryItem DictionaryItemFactory::CreateTerm(const std::string& term, int16_t* score, bool* distinct, bool* partial, bool* caseSensitive)
 {
     std::string regex;
-    bool makeSensitive = (caseSensitive != nullptr ? *caseSensitive : defaultCaseSensitive_);
+    bool makeInsensitive = (caseSensitive != nullptr ? !(*caseSensitive) : defaultCaseSensitive_);
     
-    if (makeSensitive) {
+    if (makeInsensitive) {
         regex = "(?i)";
     }
 
