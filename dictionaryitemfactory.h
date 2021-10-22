@@ -36,7 +36,7 @@ class DictionaryItemFactory {
         }
  
         DictionaryItem CreateTerm(const std::string& term, int16_t* score, bool* distinct, bool* partial, bool* caseSensitive);
-        DictionaryItem CreatePhrase(int16_t* score, bool* distinct, std::vector<std::string> terms);
+        DictionaryItem CreatePhrase(int16_t* score, bool* distinct, bool* caseSensitive, std::vector<std::string> terms);
         DictionaryItem CreateRegex(int16_t* score, bool* distinct);
         DictionaryItem CreateProximity(int16_t* score, bool* distinct, std::vector<std::string> terms);
                  

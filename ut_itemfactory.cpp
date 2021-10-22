@@ -1,3 +1,5 @@
+#include <regex>
+
 #include "gtest/gtest.h"
 
 #include "dictionaryitemfactory.h"
@@ -32,6 +34,9 @@ TEST (DictionaryItemFactoryTest, TestRegex) {
                                             &partial,
                                             &caseSensitive );
         EXPECT_EQ(di.GetRegex(), std::string("term"));
+        EXPECT_EQ(true, std::regex_search("xxtermxx",std::regex(di.GetRegex())));
+        EXPECT_EQ(false, std::regex_search("xxtrmxx",std::regex(di.GetRegex())));
+
     }
     // Case sensitive and not partial
     {
@@ -42,6 +47,9 @@ TEST (DictionaryItemFactoryTest, TestRegex) {
                                             &partial,
                                             &caseSensitive );
         EXPECT_EQ(di.GetRegex(), std::string("\\bterm\\b"));
+        EXPECT_EQ(false, std::regex_search("xxtermxx",std::regex(di.GetRegex())));
+        EXPECT_EQ(true, std::regex_search("x term xx",std::regex(di.GetRegex())));
+
     }
     // Case insensitive and partial
     {
@@ -64,3 +72,18 @@ TEST (DictionaryItemFactoryTest, TestRegex) {
         EXPECT_EQ(di.GetRegex(), std::string("(?i)\\bterm\\b"));
     }
 }
+
+TEST (DictionaryItemFactoryTest, TestPhrase) {
+    DictionaryItemFactory dif;
+    bool caseSensitive = true;
+    // Case sensitive and partial
+    {
+        caseSensitive = true;
+        DictionaryItem di = dif.CreatePhrase(nullptr, // score
+                                             nullptr, // distinct
+                                             &caseSensitive,
+                                             { "the", "cat", "sat"} );
+        std::cout << di.GetRegex() << std::endl;
+    }
+}
+
