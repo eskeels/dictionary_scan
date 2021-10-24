@@ -73,17 +73,92 @@ TEST (DictionaryItemFactoryTest, TestRegex) {
     }
 }
 
-TEST (DictionaryItemFactoryTest, TestPhrase) {
+TEST (DictionaryItemFactoryTest, TestPhrase3Terms) {
     DictionaryItemFactory dif;
     bool caseSensitive = true;
+    uint8_t distance = 5;
+
     // Case sensitive and partial
     {
         caseSensitive = true;
         DictionaryItem di = dif.CreatePhrase(nullptr, // score
                                              nullptr, // distinct
                                              &caseSensitive,
+                                             distance,                    
                                              { "the", "cat", "sat"} );
-        std::cout << di.GetRegex() << std::endl;
+        EXPECT_EQ(std::string("\\bthe[\\W\\n]{1,5}cat[\\W\\n]{1,5}sat\\b"), di.GetRegex());
+        EXPECT_EQ(true, std::regex_search("the cat sat",std::regex(di.GetRegex())));
+        EXPECT_EQ(true, std::regex_search("the? cat,    sat",std::regex(di.GetRegex())));
+
     }
 }
+
+TEST (DictionaryItemFactoryTest, TestPhrase2Terms) {
+    DictionaryItemFactory dif;
+    bool caseSensitive = true;
+    uint8_t distance = 5;
+
+    // Case sensitive and partial
+    {
+        caseSensitive = true;
+        DictionaryItem di = dif.CreatePhrase(nullptr, // score
+                                             nullptr, // distinct
+                                             &caseSensitive,
+                                             distance,                    
+                                             { "the", "cat"} );
+        EXPECT_EQ(std::string("\\bthe[\\W\\n]{1,5}cat\\b"), di.GetRegex());
+    }
+}
+
+TEST (DictionaryItemFactoryTest, TestPhrase1Term) {
+    DictionaryItemFactory dif;
+    bool caseSensitive = true;
+    uint8_t distance = 5;
+
+    // Case sensitive and partial
+    {
+        caseSensitive = true;
+        DictionaryItem di = dif.CreatePhrase(nullptr, // score
+                                             nullptr, // distinct
+                                             &caseSensitive,
+                                             distance,                    
+                                             { "the"} );
+        EXPECT_EQ(std::string("\\bthe\\b"), di.GetRegex());
+    }
+}
+
+TEST (DictionaryItemFactoryTest, TestPhrase0Term) {
+    DictionaryItemFactory dif;
+    bool caseSensitive = true;
+    uint8_t distance = 5;
+
+    // Case sensitive and partial
+    {
+        caseSensitive = true;
+        DictionaryItem di = dif.CreatePhrase(nullptr, // score
+                                             nullptr, // distinct
+                                             &caseSensitive,
+                                             distance,                    
+                                             { } );
+        EXPECT_EQ(std::string("\\b\\b"), di.GetRegex());
+    }
+}
+
+TEST (DictionaryItemFactoryTest, TestPhrase2TermsCaseInsensitive) {
+    DictionaryItemFactory dif;
+    bool caseSensitive = false;
+    uint8_t distance = 5;
+
+    // Case sensitive and partial
+    {
+        caseSensitive = false;
+        DictionaryItem di = dif.CreatePhrase(nullptr, // score
+                                             nullptr, // distinct
+                                             &caseSensitive,
+                                             distance,                    
+                                             { "the", "cat"} );
+        EXPECT_EQ(std::string("(?i)\\bthe[\\W\\n]{1,5}cat\\b"), di.GetRegex());
+    }
+}
+
 

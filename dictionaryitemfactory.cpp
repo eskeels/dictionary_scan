@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "dictionaryitemfactory.h"
 
 namespace DLP {
@@ -32,9 +34,9 @@ DictionaryItem DictionaryItemFactory::CreateTerm(const std::string& term, int16_
 }
 // Phrase
 // \bthe[\W\n]{1,10}cat\b
-DictionaryItem DictionaryItemFactory::CreatePhrase(int16_t* score, bool* distinct, bool* caseSensitive, std::vector<std::string> terms)
+DictionaryItem DictionaryItemFactory::CreatePhrase(int16_t* score, bool* distinct, bool* caseSensitive, uint8_t distance, std::vector<std::string> terms)
 {
-     std::string regex;
+    std::string regex;
     bool makeInsensitive = (caseSensitive != nullptr ? !(*caseSensitive) : defaultCaseSensitive_);
     
     if (makeInsensitive) {
@@ -46,7 +48,7 @@ DictionaryItem DictionaryItemFactory::CreatePhrase(int16_t* score, bool* distinc
     bool first = true;
     for (auto term : terms) {
         if (!first) {
-            regex.append("[\\W\\n]{1,10}");
+            regex.append("[\\W\\n]{1," + std::to_string(distance) + "}");
         }
         regex.append(term);
         first = false;
