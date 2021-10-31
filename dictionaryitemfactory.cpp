@@ -64,9 +64,46 @@ DictionaryItem DictionaryItemFactory::CreatePhrase(int16_t* score, bool* distinc
            regex);
 
     return i;
-   
 }
 
 // Proximity
 // \b(the|cat|mat)[\W\n]{1,10}(the|cat|mat)\b
+DictionaryItem DictionaryItemFactory::CreateProximity(int16_t* score, bool* distinct, bool* caseSensitive, uint8_t distance, std::vector<std::string> terms)
+{
+    std::string regex;
+    bool makeInsensitive = (caseSensitive != nullptr ? !(*caseSensitive) : defaultCaseSensitive_);
+    
+    if (makeInsensitive) {
+        regex = "(?i)";
+    }
+
+    regex.append("\\b");
+    std::string termList;
+    termList.append("(");
+
+    bool first = true;
+    for (auto term : terms) {
+        if (!first) {
+            termList.append("|");
+        }
+        termList.append(term);
+        first = false;
+    }
+    termList.append(")");
+
+    regex.append(termList);
+    regex.append("[\\W\\n]{1," + std::to_string(distance) + "}");
+    regex.append(termList);
+    regex.append("\\b");
+ 
+    DictionaryItem i(ItemType::Term,
+           (score != nullptr ? *score : defaultScore_),
+           (distinct != nullptr ? *distinct : defaultDistinct_),
+           GetId(),
+           0,
+           regex);
+
+    return i;
+}
+
 }
