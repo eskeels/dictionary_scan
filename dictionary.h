@@ -21,6 +21,11 @@ class Dictionary {
         const DictionaryItem* GetDictionaryItem(uint16_t id) const;
         uint16_t GetId() const { return id_; }
         const std::string& GetName() const { return name_; }
+        const DictionaryItem* GetFirstDictionaryItem(size_t& idx) const {
+            idx = 0;
+            return GetNextDictionaryItem(idx);
+        }
+        const DictionaryItem* GetNextDictionaryItem(size_t& idx) const;
     protected:
         // all the items in this dictionary
         std::vector<DictionaryItem> items_;

@@ -24,7 +24,16 @@ const Dictionary* Dictionaries::GetDictionary(const std::string& name) const {
     }
 
     return &dictionaries_[pos->second];
-
 }
- 
+
+const Dictionary* Dictionaries::GetNextDictionary(size_t& idx) const {
+    if (idx >= dictionaries_.size()){
+        return nullptr;
+    }
+
+    const Dictionary* ret = &dictionaries_[idx];
+    ++idx;
+    return ret;
+}
+
 }

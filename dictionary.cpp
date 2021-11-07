@@ -20,4 +20,14 @@ const DictionaryItem* Dictionary::GetDictionaryItem(uint16_t id) const {
     return &items_[pos->second];
 }
 
+const DictionaryItem* Dictionary::GetNextDictionaryItem(size_t& idx) const {
+    if (idx >= items_.size()){
+        return nullptr;
+    }
+
+    const DictionaryItem* ret = &items_[idx];
+    ++idx;
+    return ret;
+}
+
 }
