@@ -6,10 +6,22 @@
 
 using namespace DLP;
 
+bool verifyRegex( const std::string& regex, const std::string& txt, bool trigger ) {
+    std::string r(regex);
+    std::regex::flag_type f(std::regex_constants::ECMAScript);
+    if (regex.substr(0,4) == "(?i)") {
+        r = regex.substr(4);
+        f |= std::regex_constants::icase;
+    }
+    std::regex rgx(r,f);
+    return (trigger == std::regex_search(txt, rgx));
+}
+
 TEST (DictionaryItemFactoryTest, AllDefault) {
     DictionaryItemFactory dif;
     DictionaryItem di = dif.CreateTerm("term", nullptr, nullptr, nullptr, nullptr);
     EXPECT_EQ(di.GetRegex(), std::string("\\bterm\\b"));
+    EXPECT_TRUE(verifyRegex(di.GetRegex(), "  term  ", true));
 }
 
 TEST (DictionaryItemFactoryTest, SetDefaults) {
@@ -34,9 +46,8 @@ TEST (DictionaryItemFactoryTest, TestRegex) {
                                             &partial,
                                             &caseSensitive );
         EXPECT_EQ(di.GetRegex(), std::string("term"));
-        EXPECT_EQ(true, std::regex_search("xxtermxx",std::regex(di.GetRegex())));
-        EXPECT_EQ(false, std::regex_search("xxtrmxx",std::regex(di.GetRegex())));
-
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "xxtermxx", true));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "xxtrmxx", false));
     }
     // Case sensitive and not partial
     {
@@ -47,8 +58,8 @@ TEST (DictionaryItemFactoryTest, TestRegex) {
                                             &partial,
                                             &caseSensitive );
         EXPECT_EQ(di.GetRegex(), std::string("\\bterm\\b"));
-        EXPECT_EQ(false, std::regex_search("xxtermxx",std::regex(di.GetRegex())));
-        EXPECT_EQ(true, std::regex_search("x term xx",std::regex(di.GetRegex())));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "xxtermxx", false));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "x term xx", true));
 
     }
     // Case insensitive and partial
@@ -60,8 +71,11 @@ TEST (DictionaryItemFactoryTest, TestRegex) {
                                             &partial,
                                             &caseSensitive );
         EXPECT_EQ(di.GetRegex(), std::string("(?i)term"));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "xxtermxx", true));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "x term xx", true));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "x TeRM xx", true));
     }
-    // Case sensitive and not partial
+    // Case insensitive and not partial
     {
         partial = false; caseSensitive = false;
         DictionaryItem di = dif.CreateTerm( "term", 
@@ -70,6 +84,9 @@ TEST (DictionaryItemFactoryTest, TestRegex) {
                                             &partial,
                                             &caseSensitive );
         EXPECT_EQ(di.GetRegex(), std::string("(?i)\\bterm\\b"));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "x term xx", true));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "x termxx", false));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "x TERM xx", true));
     }
 }
 
@@ -89,7 +106,8 @@ TEST (DictionaryItemFactoryTest, TestPhrase3Terms) {
         EXPECT_EQ(std::string("\\bthe[\\W\\n]{1,5}cat[\\W\\n]{1,5}sat\\b"), di.GetRegex());
         EXPECT_EQ(true, std::regex_search("the cat sat",std::regex(di.GetRegex())));
         EXPECT_EQ(true, std::regex_search("the? cat,    sat",std::regex(di.GetRegex())));
-
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "the cat sat", true));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "the? cat,    sat", true));
     }
 }
 
@@ -98,7 +116,7 @@ TEST (DictionaryItemFactoryTest, TestPhrase2Terms) {
     bool caseSensitive = true;
     uint8_t distance = 5;
 
-    // Case sensitive and partial
+    // Case sensitive
     {
         caseSensitive = true;
         DictionaryItem di = dif.CreatePhrase(nullptr, // score
@@ -107,6 +125,8 @@ TEST (DictionaryItemFactoryTest, TestPhrase2Terms) {
                                              distance,                    
                                              { "the", "cat"} );
         EXPECT_EQ(std::string("\\bthe[\\W\\n]{1,5}cat\\b"), di.GetRegex());
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "the? cat,    sat", true));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "the? CAT,    sat", false));
     }
 }
 
@@ -149,7 +169,7 @@ TEST (DictionaryItemFactoryTest, TestPhrase2TermsCaseInsensitive) {
     bool caseSensitive = false;
     uint8_t distance = 5;
 
-    // Case insensitive and partial
+    // Case insensitive
     {
         caseSensitive = false;
         DictionaryItem di = dif.CreatePhrase(nullptr, // score
@@ -158,6 +178,9 @@ TEST (DictionaryItemFactoryTest, TestPhrase2TermsCaseInsensitive) {
                                              distance,                    
                                              { "the", "cat"} );
         EXPECT_EQ(std::string("(?i)\\bthe[\\W\\n]{1,5}cat\\b"), di.GetRegex());
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "the CAT    sat", true));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "the? CAT    sat", true));
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), "the CAT,    sat", true));
     }
 }
 
@@ -176,22 +199,23 @@ TEST (DictionaryItemFactoryTest, TestPhrase2TermsCaseSensitive) {
                                              { "THE", "cat"} );
         EXPECT_EQ(std::string("\\bTHE[\\W\\n]{1,5}cat\\b"), di.GetRegex());
         EXPECT_EQ(true, std::regex_search(" THE?! cat,??    sat",std::regex(di.GetRegex())));
+        EXPECT_EQ(false, std::regex_search(" THE?!    cat,??    sat",std::regex(di.GetRegex())));
     }
 }
 
-TEST (DictionaryItemFactoryTest, TestProximity2TermsCaseSensitive) {
+TEST (DictionaryItemFactoryTest, TestProximity3TermsCaseSensitive) {
     DictionaryItemFactory dif;
     bool caseSensitive = false;
     uint8_t distance = 5;
 
-    // Case sensitive and partial
     {
         caseSensitive = true;
         DictionaryItem di = dif.CreateProximity(nullptr, // score
                                                 nullptr, // distinct
                                                 &caseSensitive,
                                                 distance,                    
-                                                { "THE", "cat"} );
-        EXPECT_EQ(std::string("\\b(THE|cat)[\\W\\n]{1,5}(THE|cat)\\b"), di.GetRegex());
+                                                { "THE", "cat","sat"} );
+        EXPECT_TRUE(verifyRegex(di.GetRegex(), " THE?! cat,??    sat", true));
     }
 }
+

@@ -1,7 +1,7 @@
 message("source dir is ${CMAKE_SOURCE_DIR}")
 include_directories(${CMAKE_SOURCE_DIR}/../googletest/googletest/include)
 link_directories(${CMAKE_SOURCE_DIR}/../googletest/build/lib)
-add_executable(ut_itemfactory ut_itemfactory.cpp dictionaryitemfactory.cpp gmain.cpp)
+add_executable(ut_itemfactory ut/ut_itemfactory.cpp dictionaryitemfactory.cpp gmain.cpp)
 target_link_libraries(ut_itemfactory libgtest.a pthread)
 
 add_executable(simplegrep2 simplegrep.cpp dictionaryitemfactory.cpp dictionary.cpp dictionaries.cpp)
