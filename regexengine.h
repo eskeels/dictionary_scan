@@ -1,9 +1,10 @@
 #pragma once
 
+#include "iregexengine.h"
 #include "dictionaries.h"
 
 namespace DLP {
-class RegexEngine {
+class RegexEngine : public IRegexEngine {
     public:
         void Initialise(const Dictionaries* ds);
 
