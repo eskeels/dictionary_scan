@@ -68,6 +68,7 @@
 #include "dictionaryitem.h"
 #include "dictionary.h"
 #include "dictionaries.h"
+#include "hsregexengine.h"
 
 /**
  * This is the function that will be called for each match that occurs. @a ctx
@@ -174,6 +175,9 @@ int main(int argc, char *argv[]) {
     DLP::Dictionaries ds;
     ds.Add(std::move(d));
 
+    DLP::HSRegexEngine hsre;// = new DLP::HSRegexEngine;
+    hsre.Register(&ds);
+    hsre.Initialize();
     
     const DLP::Dictionary* pD = ds.GetDictionary("D1");
     if (pD) {
