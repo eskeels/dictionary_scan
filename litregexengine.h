@@ -1,17 +1,17 @@
 #pragma once
 
-#include <hs.h>
+#include <chimera/ch.h>
 
 #include "hsbaseregexengine.h"
 #include "dictionaries.h"
 
 namespace DLP {
-class HSRegexEngine : public HSBaseRegexEngine {
+class LitRegexEngine : public HSBaseRegexEngine {
     public:
         void Initialize();
-        void Serialize();
+        void Serialize(); 
         unsigned GetFlags(const DictionaryItem* /*di*/) {
-            return HS_FLAG_MULTILINE|HS_FLAG_DOTALL|HS_FLAG_UTF8|HS_FLAG_UCP;
+            return HS_FLAG_CASELESS|HS_FLAG_SOM_LEFTMOST;
         }
 };
 }

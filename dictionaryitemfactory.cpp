@@ -4,6 +4,9 @@
 
 namespace DLP {
 
+const std::string WB_START = "(\\W|^)";
+const std::string WB_END   = "(\\W|$)";
+
 DictionaryItem DictionaryItemFactory::CreateTerm(const std::string& term, int16_t* score, bool* distinct, bool* partial, bool* caseSensitive)
 {
     std::string regex;
@@ -16,14 +19,14 @@ DictionaryItem DictionaryItemFactory::CreateTerm(const std::string& term, int16_
     bool makePartial = (partial != nullptr ? *partial : defaultPartial_);
 
     if (!makePartial) {
-        regex.append("\\b");
+        regex.append(WB_START);
     }
     regex.append(term);
     if (!makePartial) {
-        regex.append("\\b");
+        regex.append(WB_END);
     }
 
-    DictionaryItem i(ItemType::Term,
+    DictionaryItem i((makePartial ? ItemType::TermPartial : ItemType::Term),
            (score != nullptr ? *score : defaultScore_),
            (distinct != nullptr ? *distinct : defaultDistinct_),
            GetId(),
@@ -43,7 +46,7 @@ DictionaryItem DictionaryItemFactory::CreatePhrase(int16_t* score, bool* distinc
         regex = "(?i)";
     }
 
-    regex.append("\\b");
+    regex.append(WB_START);
 
     bool first = true;
     for (auto term : terms) {
@@ -54,7 +57,7 @@ DictionaryItem DictionaryItemFactory::CreatePhrase(int16_t* score, bool* distinc
         first = false;
     }
 
-    regex.append("\\b");
+    regex.append(WB_END);
  
     DictionaryItem i(ItemType::Term,
            (score != nullptr ? *score : defaultScore_),
@@ -77,7 +80,7 @@ DictionaryItem DictionaryItemFactory::CreateProximity(int16_t* score, bool* dist
         regex = "(?i)";
     }
 
-    regex.append("\\b");
+    regex.append(WB_START);
     std::string termList;
     termList.append("(");
 
@@ -94,7 +97,7 @@ DictionaryItem DictionaryItemFactory::CreateProximity(int16_t* score, bool* dist
     regex.append(termList);
     regex.append("[\\W\\n]{1," + std::to_string(distance) + "}");
     regex.append(termList);
-    regex.append("\\b");
+    regex.append(WB_END);
  
     DictionaryItem i(ItemType::Term,
            (score != nullptr ? *score : defaultScore_),

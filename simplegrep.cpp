@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
     }
 
     DLP::DictionaryItemFactory ifactory;
-    ifactory.SetDefaults(10,false,false,false,10);
+    ifactory.SetDefaults(10,false,false,true,10);
     DLP::Dictionary d("D1", 1, 1);
     int16_t score = 20;
     bool partial = false;
@@ -193,13 +193,14 @@ int main(int argc, char *argv[]) {
     std::vector<const char *> expressions;
     std::vector<unsigned> flags;
     std::vector<unsigned> ids;
-std::string exp1 = "A\\d\\d";
-std::string exp2 = "B\\d\\d";
+std::string exp1 = "(?i)(\\W|^)bird(\\W|$)";
+std::string exp2 = "(?i)(\\W|^)dog(\\W|$)";
+
 std::cout << "unsigned int size is " << sizeof(unsigned int) << std::endl;
 expressions.push_back(exp1.c_str());
 expressions.push_back(exp2.c_str());
-flags.push_back(HS_FLAG_MULTILINE|HS_FLAG_DOTALL|HS_FLAG_UTF8|HS_FLAG_UCP|HS_FLAG_SOM_LEFTMOST);
-flags.push_back(HS_FLAG_MULTILINE|HS_FLAG_DOTALL|HS_FLAG_UTF8|HS_FLAG_UCP|HS_FLAG_SOM_LEFTMOST);
+flags.push_back(HS_FLAG_MULTILINE|HS_FLAG_DOTALL|HS_FLAG_UTF8|HS_FLAG_UCP); //|HS_FLAG_SOM_LEFTMOST);
+flags.push_back(HS_FLAG_MULTILINE|HS_FLAG_DOTALL|HS_FLAG_UTF8|HS_FLAG_UCP); //|HS_FLAG_SOM_LEFTMOST);
 ids.push_back(0);
 ids.push_back(1);
 

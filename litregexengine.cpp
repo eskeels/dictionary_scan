@@ -2,19 +2,20 @@
 
 #include <hs.h>
 
-#include "hsregexengine.h"
+#include "litregexengine.h"
 #include "dictionarytermid.h"
 
 namespace DLP {
 
-    void HSRegexEngine::Initialize() {
+    void LitRegexEngine::Initialize() {
 std::cout << expressions_[0] << std::endl << expressions_[1] << std::endl;
         hs_compile_error_t *compile_err;
-        if (hs_compile_multi(&expressions_[0],
-                             &flags_[0],
-                             &ids_[0],
-                             expressions_.size(),
-                             HS_MODE_BLOCK,
+        if (hs_compile_lit_multi(&expressions_[0],
+                                 &flags_[0],
+                                 &ids_[0],
+                                 &lens_[0],
+                                 expressions_.size(),
+                                 HS_MODE_BLOCK,
                              NULL,
                              &database_,
                              &compile_err) != HS_SUCCESS) {
@@ -24,7 +25,7 @@ std::cout << expressions_[0] << std::endl << expressions_[1] << std::endl;
         }
     }
 
-    void HSRegexEngine::Serialize() {
+    void LitRegexEngine::Serialize() {
         char *bytes;
         size_t length;
         if (HS_SUCCESS == hs_serialize_database(database_, &bytes, &length)) {

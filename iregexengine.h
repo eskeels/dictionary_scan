@@ -12,6 +12,7 @@ class IRegexEngine {
         virtual void Register(const Dictionaries* ds) = 0;
         virtual void RegisterDictionaryItem(uint16_t dictionaryId, const DictionaryItem* di) = 0;
         virtual void Initialize() = 0;
+        virtual void Serialize() = 0;
         virtual ~IRegexEngine(){};
 };
 

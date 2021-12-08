@@ -7,7 +7,7 @@
 namespace DLP
 {
 
-enum class ItemType { Term, Phrase, Regex, Proximity }; 
+enum class ItemType { Term, TermPartial, Phrase, Regex, Proximity }; 
 
 class DictionaryItem {
     public:
