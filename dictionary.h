@@ -16,19 +16,20 @@ class Dictionary {
             : name_(name),
               id_(id),
               rev_(rev) {}
-        void Add(DictionaryItem&& item);
+        ~Dictionary();
+        void Add(const IDictionaryItem* item);
 
-        const DictionaryItem* GetDictionaryItem(uint16_t id) const;
+        const IDictionaryItem* GetDictionaryItem(uint16_t id) const;
         uint16_t GetId() const { return id_; }
         const std::string& GetName() const { return name_; }
-        const DictionaryItem* GetFirstDictionaryItem(size_t& idx) const {
+        const IDictionaryItem* GetFirstDictionaryItem(size_t& idx) const {
             idx = 0;
             return GetNextDictionaryItem(idx);
         }
-        const DictionaryItem* GetNextDictionaryItem(size_t& idx) const;
+        const IDictionaryItem* GetNextDictionaryItem(size_t& idx) const;
     protected:
         // all the items in this dictionary
-        std::vector<DictionaryItem> items_;
+        std::vector<const IDictionaryItem*> items_;
         // item id to offset in above vector
         std::unordered_map<uint16_t,uint16_t> itemsIndx_;
         // name of dictionary

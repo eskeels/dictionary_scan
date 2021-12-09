@@ -4,37 +4,18 @@
 
 namespace DLP {
 
-const std::string WB_START = "(\\W|^)";
-const std::string WB_END   = "(\\W|$)";
-
-DictionaryItem DictionaryItemFactory::CreateTerm(const std::string& term, int16_t* score, bool* distinct, bool* partial, bool* caseSensitive)
+IDictionaryItem* DictionaryItemFactory::CreateRegex(const std::string& regex, int16_t* score, bool* distinct, bool* partial, bool* caseSensitive)
 {
-    std::string regex;
-    bool makeInsensitive = (caseSensitive != nullptr ? !(*caseSensitive) : defaultCaseSensitive_);
-    
-    if (makeInsensitive) {
-        regex = "(?i)";
-    }
-
-    bool makePartial = (partial != nullptr ? *partial : defaultPartial_);
-
-    if (!makePartial) {
-        regex.append(WB_START);
-    }
-    regex.append(term);
-    if (!makePartial) {
-        regex.append(WB_END);
-    }
-
-    DictionaryItem i((makePartial ? ItemType::TermPartial : ItemType::Term),
-           (score != nullptr ? *score : defaultScore_),
-           (distinct != nullptr ? *distinct : defaultDistinct_),
-           GetId(),
-           0,
-           regex);
-
-    return i;
+    return new Regex( (score != nullptr ? *score : defaultScore_),
+                      (distinct != nullptr ? *distinct : defaultDistinct_),
+                      (partial != nullptr ? *partial : defaultPartial_),
+                      (caseSensitive != nullptr ? *caseSensitive : defaultCaseSensitive_),
+                       GetId(),
+                       0, // valgo id
+                       regex );
 }
+
+/*
 // Phrase
 // \bthe[\W\n]{1,10}cat\b
 DictionaryItem DictionaryItemFactory::CreatePhrase(int16_t* score, bool* distinct, bool* caseSensitive, uint8_t distance, std::vector<std::string> terms)
@@ -108,5 +89,5 @@ DictionaryItem DictionaryItemFactory::CreateProximity(int16_t* score, bool* dist
 
     return i;
 }
-
+*/
 }

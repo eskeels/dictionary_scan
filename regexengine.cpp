@@ -14,7 +14,7 @@ namespace DLP {
 std::cout << "IN Regex Engine HERE" << std::endl;
         while(d != nullptr) {
             size_t diidx = 0;
-            const DictionaryItem* di = d->GetFirstDictionaryItem(diidx);
+            const IDictionaryItem* di = d->GetFirstDictionaryItem(diidx);
             uint16_t dictionaryId = d->GetId();
 std::cout << "ID " << dictionaryId << std::endl;
             while(di != nullptr) {

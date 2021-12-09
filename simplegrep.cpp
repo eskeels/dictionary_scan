@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
     DLP::Dictionary d("D1", 1, 1);
     int16_t score = 20;
     bool partial = false;
-    
+   /* 
     d.Add(ifactory.CreateTerm("badger",&score,nullptr,&partial,nullptr));
     partial = true;
     d.Add(ifactory.CreateTerm("otter",&score,nullptr,&partial,nullptr));
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
     } else {
         std::cout << "D1 not found" << std::endl;
     }
-
+*/
     char *pattern = argv[1];
     char *inputFN = argv[2];
 

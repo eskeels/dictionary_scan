@@ -6,6 +6,8 @@
 #include "dictionarytermid.h"
 
 namespace DLP {
+    LitRegexEngine::~LitRegexEngine() {
+    }
 
     void LitRegexEngine::Initialize() {
 std::cout << expressions_[0] << std::endl << expressions_[1] << std::endl;

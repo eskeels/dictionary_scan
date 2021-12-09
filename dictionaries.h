@@ -5,7 +5,8 @@
 namespace DLP {
 class Dictionaries {
     public:
-        void Add(Dictionary&& d);
+        ~Dictionaries();
+        void Add(const Dictionary* d);
         // Get dictionary by name
         const Dictionary* GetDictionary(const std::string& name) const;
         // Get dictionary by id
@@ -23,7 +24,7 @@ class Dictionaries {
         size_t GetDictionaryCount() const { return dictionaries_.size(); }
     protected:
         // all the dictionaries
-        std::vector<Dictionary> dictionaries_;
+        std::vector<const Dictionary*> dictionaries_;
         // dictionary id to offset in above vector        
         std::unordered_map<uint16_t,uint16_t> dictionariesIndx_;
         // dictionary name to offset

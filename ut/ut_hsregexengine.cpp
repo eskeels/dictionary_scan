@@ -34,17 +34,16 @@ void AddDictionary( DLP::Dictionaries& ds,
                          true,    // case sensitive
                          10);     // distance
 
-    DLP::Dictionary d(name, id, 1);
+    DLP::Dictionary* d = new Dictionary(name, id, 1);
     for ( auto& t : terms ) { 
-        d.Add(ifactory.CreateTerm(t,nullptr,nullptr,nullptr,nullptr));
+        d->Add(ifactory.CreateRegex(t,nullptr,nullptr,nullptr,nullptr));
     }
-
-    ds.Add(std::move(d));
+    ds.Add(d);
 }
 
 std::string getWord() {
     std::string tmp;    
-int len = 1+(rand() % 9);
+int len = 3+(rand() % 9);
     for (size_t i = 0; i < len; ++i) {
          int randomChar = rand()%(26+26+10);
          if (randomChar < 26)
@@ -56,7 +55,6 @@ int len = 1+(rand() % 9);
     
             
      }
-std::cout << tmp << std::endl;
 return tmp;
 }
 
@@ -67,12 +65,12 @@ for (int i = 0; i < 3000; ++i) {
 words.push_back(getWord());
 }
     AddDictionary( ds, "animals", 1 , words );
-/*
+
     DLP::HSRegexEngine hsre;
     hsre.Register(&ds);
     hsre.Initialize();
     hsre.Serialize();
-*/
+
     DLP::LitRegexEngine chre;
     chre.Register(&ds);
     chre.Initialize();

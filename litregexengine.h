@@ -1,17 +1,24 @@
 #pragma once
 
-#include <chimera/ch.h>
-
 #include "hsbaseregexengine.h"
 #include "dictionaries.h"
 
 namespace DLP {
 class LitRegexEngine : public HSBaseRegexEngine {
     public:
+        virtual ~LitRegexEngine();
+
         void Initialize();
         void Serialize(); 
-        unsigned GetFlags(const DictionaryItem* /*di*/) {
-            return HS_FLAG_CASELESS|HS_FLAG_SOM_LEFTMOST;
+        unsigned GetFlags(const IDictionaryItem* di) {
+            unsigned flag = HS_FLAG_CASELESS|HS_FLAG_SOM_LEFTMOST;
+            if (di->IsCaseSensitive()) {
+                flag |= HS_FLAG_CASELESS;
+            }
+            if (di->IsDistinct()) {
+                flag |= HS_FLAG_SINGLEMATCH;
+            }
+            return flag;
         }
 };
 }
