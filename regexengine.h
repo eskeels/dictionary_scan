@@ -14,6 +14,7 @@ class RegexEngine : public IRegexEngine {
         virtual void RegisterDictionaryItem(uint16_t dictionaryId, const IDictionaryItem* di) = 0;
         virtual void Initialize() = 0;
         virtual void Serialize() = 0;
+        virtual IRegexScanState* CreateRegexScanState() const = 0;
 };
 
 }

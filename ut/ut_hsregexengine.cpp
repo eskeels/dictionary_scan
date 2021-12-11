@@ -5,6 +5,7 @@
 #include "hsregexengine.h"
 #include "litregexengine.h"
 #include "dictionaryitemfactory.h"
+#include "dictionaryscanner.h"
 
 using namespace DLP;
 
@@ -42,7 +43,7 @@ void AddDictionary( DLP::Dictionaries& ds,
 }
 
 std::string getWord() {
-    std::string tmp;    
+    std::string tmp("\\W");    
 int len = 3+(rand() % 9);
     for (size_t i = 0; i < len; ++i) {
          int randomChar = rand()%(26+26+10);
@@ -55,13 +56,13 @@ int len = 3+(rand() % 9);
     
             
      }
-return tmp;
+return tmp+"\\W";
 }
 
 TEST (DictionaryItemFactoryTest, AllDefault) {
     DLP::Dictionaries ds;
 std::vector<std::string> words;
-for (int i = 0; i < 3000; ++i) {
+for (int i = 0; i < 300; ++i) {
 words.push_back(getWord());
 }
     AddDictionary( ds, "animals", 1 , words );
@@ -69,13 +70,23 @@ words.push_back(getWord());
     DLP::HSRegexEngine hsre;
     hsre.Register(&ds);
     hsre.Initialize();
+    IRegexScanState* rss = hsre.CreateRegexScanState();
+    std::cout << "Created scan state" << std::endl;
     hsre.Serialize();
 
-    DLP::LitRegexEngine chre;
+    delete rss;
+
+    std::vector<uint16_t> dictionaryIds;
+
+    DLP::DictionaryScanner dscanner(&ds);
+    dscanner.Initialize(dictionaryIds);
+    IScanState* ss = dscanner.CreateScanState();
+
+/*  DLP::LitRegexEngine chre;
     chre.Register(&ds);
     chre.Initialize();
     chre.Serialize();
-
+*/
 }
 
 

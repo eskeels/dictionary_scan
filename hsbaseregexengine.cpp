@@ -4,6 +4,7 @@
 
 #include "hsbaseregexengine.h"
 #include "dictionarytermid.h"
+#include "hsregexscanstate.h"
 
 namespace DLP {
     HSBaseRegexEngine::~HSBaseRegexEngine() {
@@ -19,6 +20,16 @@ namespace DLP {
         ids_.push_back(dti.GetId());
         flags_.push_back(GetFlags(di));
         lens_.push_back(di->GetRegex().size());
+    }
+
+    IRegexScanState* HSBaseRegexEngine::CreateRegexScanState() const {
+        std::cout << __LINE__ << std::endl;
+        HSRegexScanState* rss = new HSRegexScanState(dictionaries_);
+        std::cout << __LINE__ << std::endl;
+
+        rss->Initialize(database_);
+        std::cout << __LINE__ << std::endl;
+        return rss;
     }
 }
 

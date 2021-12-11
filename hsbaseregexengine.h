@@ -11,6 +11,8 @@ class HSBaseRegexEngine : public RegexEngine {
         void Initialize() = 0;
         void Serialize() = 0; 
         virtual unsigned GetFlags(const IDictionaryItem* di) = 0;
+        virtual IRegexScanState* CreateRegexScanState() const;
+
     protected:
         const Dictionaries* dictionaries_;
         std::vector<const char *> expressions_;

@@ -6,6 +6,7 @@ namespace DLP {
 
 class Dictionaries;
 class IDictionaryItem;
+class IRegexScanState;
 
 class IRegexEngine {
     public:
@@ -14,6 +15,7 @@ class IRegexEngine {
         virtual void Initialize() = 0;
         virtual void Serialize() = 0;
         virtual ~IRegexEngine(){};
+        virtual IRegexScanState* CreateRegexScanState() const = 0;
 };
 
 }

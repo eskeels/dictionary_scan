@@ -15,9 +15,9 @@ class LitRegexEngine : public HSBaseRegexEngine {
             if (di->IsCaseSensitive()) {
                 flag |= HS_FLAG_CASELESS;
             }
-            if (di->IsDistinct()) {
-                flag |= HS_FLAG_SINGLEMATCH;
-            }
+  //          if (di->IsDistinct()) {
+    //            flag |= HS_FLAG_SINGLEMATCH;
+      //      }
             return flag;
         }
 };
