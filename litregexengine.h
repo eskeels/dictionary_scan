@@ -7,6 +7,7 @@ namespace DLP {
 class LitRegexEngine : public HSBaseRegexEngine {
     public:
         virtual ~LitRegexEngine();
+        void RegisterDictionaryItem(uint16_t dictionaryId, const IDictionaryItem* di);
 
         void Initialize();
         void Serialize(); 

@@ -6,8 +6,10 @@
 #include "litregexengine.h"
 #include "dictionaryitemfactory.h"
 #include "dictionaryscanner.h"
+#include "dictionaryscanmatches.h"
 
 using namespace DLP;
+bool verifyRegex( const std::string& regex, const std::string& txt, bool trigger );
 
 bool verifyRegex( const std::string& regex, const std::string& txt, bool trigger ) {
     std::string r(regex);
@@ -19,7 +21,6 @@ bool verifyRegex( const std::string& regex, const std::string& txt, bool trigger
     std::regex rgx(r,f);
     return (trigger == std::regex_search(txt, rgx));
 }
-
 void AddDictionary( DLP::Dictionaries& ds,
                     const std::string& name,
                     uint16_t id,
@@ -27,12 +28,20 @@ void AddDictionary( DLP::Dictionaries& ds,
                     int16_t score = 20,
                     bool partial = false,
                     bool distiinct = false,
-                    bool caseSens = true ) {
+                    bool caseSens = true );
+void AddDictionary( DLP::Dictionaries& ds,
+                    const std::string& name,
+                    uint16_t id,
+                    const std::vector<std::string> terms,
+                    int16_t score,
+                    bool partial,
+                    bool distiinct,
+                    bool caseSens) {
     DLP::DictionaryItemFactory ifactory;
     ifactory.SetDefaults(score,
-                         false,   // distinct
-                         true, // partial
-                         true,    // case sensitive
+                         distiinct,   // distinct
+                         partial, // partial
+                         caseSens,    // case sensitive
                          10);     // distance
 
     DLP::Dictionary* d = new Dictionary(name, id, 1);
@@ -41,10 +50,11 @@ void AddDictionary( DLP::Dictionaries& ds,
     }
     ds.Add(d);
 }
+std::string getWord();
 
 std::string getWord() {
-    std::string tmp("\\W");    
-int len = 3+(rand() % 9);
+    std::string tmp; // ("\\W");    
+size_t len = 3+(rand() % 9);
     for (size_t i = 0; i < len; ++i) {
          int randomChar = rand()%(26+26+10);
          if (randomChar < 26)
@@ -56,7 +66,7 @@ int len = 3+(rand() % 9);
     
             
      }
-return tmp+"\\W";
+return tmp;//+"\\W";
 }
 
 TEST (DictionaryItemFactoryTest, AllDefault) {
@@ -65,8 +75,10 @@ std::vector<std::string> words;
 for (int i = 0; i < 300; ++i) {
 words.push_back(getWord());
 }
-    AddDictionary( ds, "animals", 1 , words );
+words.push_back("sat");
 
+    AddDictionary( ds, "animals", 1 , words );
+/*
     DLP::HSRegexEngine hsre;
     hsre.Register(&ds);
     hsre.Initialize();
@@ -75,12 +87,17 @@ words.push_back(getWord());
     hsre.Serialize();
 
     delete rss;
-
+*/
     std::vector<uint16_t> dictionaryIds;
 
     DLP::DictionaryScanner dscanner(&ds);
     dscanner.Initialize(dictionaryIds);
     IScanState* ss = dscanner.CreateScanState();
+
+    std::string input("the cat sat on the mat");
+
+    DLP::DictionaryScanMatches dsm(&ds);
+    dscanner.Scan(&dsm, ss, 0, input.c_str(), input.size(), input.c_str(), input.size());
 
 /*  DLP::LitRegexEngine chre;
     chre.Register(&ds);

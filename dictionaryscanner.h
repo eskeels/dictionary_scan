@@ -10,11 +10,11 @@
 #include "dictionaries.h"
 #include "hsregexengine.h"
 #include "litregexengine.h"
+#include "dictionaryscanstate.h"
+#include "dictionaryscanmatches.h"
 
 namespace DLP
 {
-class DictionaryScanState;
-
 class DictionaryScanner : public IScanner {
     public:
         DictionaryScanner(const Dictionaries* ds);
@@ -24,7 +24,7 @@ class DictionaryScanner : public IScanner {
 
         IScanState* CreateScanState() const;
 
-        void Scan(IScanState* ss, size_t offset, const char * input, const char * normalized) const;
+        void Scan(IScanMatches* sm, IScanState* ss, size_t offset, const char * input, size_t ilen, const char * normalized, size_t nlen) const;
 
     protected:
         const Dictionaries* dictionaries_;

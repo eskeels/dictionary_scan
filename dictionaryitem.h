@@ -33,6 +33,7 @@ class DictionaryItem : public IDictionaryItem {
         int16_t GetScore() const { return score_; }
         bool IsDistinct() const { return distinct_; }
         bool IsCaseSensitive() const { return caseSensitive_; }
+        bool IsLiteral() const { return false; }
     protected:
         int16_t score_;
         bool distinct_;
@@ -52,6 +53,8 @@ class Literal : public DictionaryItem {
                 std::string regex) : DictionaryItem(score,distinct,partial,caseSensitive,id,regex)
         {
         }
+
+        bool IsLiteral() const { return true; }
 };
 
 class Regex : public DictionaryItem {

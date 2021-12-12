@@ -10,7 +10,7 @@ class HSRegexScanState : public IRegexScanState {
         HSRegexScanState(const Dictionaries* dictionaries);
         virtual ~HSRegexScanState();
         void Initialize(const hs_database_t *database);
-
+        hs_scratch_t* GetScratch() { return scratch_; }
     protected:
         const Dictionaries* dictionaries_;
         hs_scratch_t* scratch_ = nullptr;

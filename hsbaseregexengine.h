@@ -7,11 +7,12 @@ namespace DLP {
 class HSBaseRegexEngine : public RegexEngine {
     public:
         virtual ~HSBaseRegexEngine();
-        void RegisterDictionaryItem(uint16_t dictionaryId, const IDictionaryItem* di);
+        virtual void RegisterDictionaryItem(uint16_t dictionaryId, const IDictionaryItem* di) = 0;
         void Initialize() = 0;
         void Serialize() = 0; 
         virtual unsigned GetFlags(const IDictionaryItem* di) = 0;
         virtual IRegexScanState* CreateRegexScanState() const;
+        hs_database_t* GetDatabase() { return database_; }
 
     protected:
         const Dictionaries* dictionaries_;

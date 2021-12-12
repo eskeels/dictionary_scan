@@ -13,8 +13,8 @@ class DictionaryScanState : public IScanState {
     public:
         DictionaryScanState(HSRegexEngine* regexEngine, LitRegexEngine* litRegexEngine);
         ~DictionaryScanState();
-        IRegexScanState* GetRegexScanState() { return regexEngine_; }
-        IRegexScanState* GetLitScanState() { return litRegexEngine_; }
+        IRegexScanState* GetRegexScanState() { return regexScanState_; }
+        IRegexScanState* GetLitScanState() { return litScanState_; }
     protected:
         IRegexScanState* regexScanState_ = nullptr;
         IRegexScanState* litScanState_ = nullptr;

@@ -8,6 +8,9 @@
 namespace DLP {
 class HSRegexEngine : public HSBaseRegexEngine {
     public:
+        ~HSRegexEngine();
+        void RegisterDictionaryItem(uint16_t dictionaryId, const IDictionaryItem* di);
+
         void Initialize();
         void Serialize();
         unsigned GetFlags(const IDictionaryItem* di) {
