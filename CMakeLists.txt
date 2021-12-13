@@ -8,7 +8,7 @@ target_link_libraries(ut_itemfactory libgtest.a pthread)
 add_executable(ut_dictionarytermid ut/ut_dictionarytermid.cpp gmain.cpp)
 target_link_libraries(ut_dictionarytermid libgtest.a pthread)
 
-add_executable(ut_hsregexengine ut/ut_hsregexengine.cpp dictionaryscanmatches.cpp dictionaryscanstate.cpp dictionaryscanner.cpp hsregexscanstate.cpp litregexengine.cpp hsbaseregexengine.cpp dictionaries.cpp dictionary.cpp dictionaryitemfactory.cpp hsregexengine.cpp regexengine.cpp gmain.cpp)
+add_executable(ut_hsregexengine ut/ut_hsregexengine.cpp dictionaryscanstate.cpp dictionaryscanner.cpp hsregexscanstate.cpp litregexengine.cpp hsbaseregexengine.cpp dictionaries.cpp dictionaryscanmatches.cpp dictionary.cpp dictionaryitemfactory.cpp hsregexengine.cpp regexengine.cpp gmain.cpp)
 target_link_libraries(ut_hsregexengine libgtest.a pthread hs)
 
 target_compile_options(ut_hsregexengine PRIVATE -Wall -Wextra -Wpedantic -Werror)

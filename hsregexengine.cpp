@@ -12,6 +12,7 @@ namespace DLP {
     void HSRegexEngine::RegisterDictionaryItem(uint16_t dictionaryId, const IDictionaryItem* di) {
 // std::cout << "term is " << di->GetRegex() << std::endl;
         if (!di->IsLiteral()) {
+            itemCount_++;
             expressions_.push_back(di->GetRegex().c_str());
             uint16_t termId = di->GetId();
             // each id holds the dictionary id and term id

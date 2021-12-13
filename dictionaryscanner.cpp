@@ -19,8 +19,12 @@ DictionaryScanner::~DictionaryScanner() {
 void DictionaryScanner::Initialize(const std::vector<uint16_t>& /*dictionaryIds*/) {
     regexEngine_->Register(dictionaries_);
     litRegexEngine_->Register(dictionaries_);
-    regexEngine_->Initialize();
-    litRegexEngine_->Initialize();
+    if (regexEngine_->GetItemCount() > 0) {
+        regexEngine_->Initialize();
+    }
+    if (litRegexEngine_->GetItemCount() > 0) {
+        litRegexEngine_->Initialize();
+    }
 }
 
 IScanState* DictionaryScanner::CreateScanState() const {
@@ -59,15 +63,18 @@ void DictionaryScanner::Scan(IScanMatches* sm, IScanState* ss, size_t /*offset*/
     DictionaryScanState* dss = static_cast<DictionaryScanState*>(ss);
     HSRegexScanState* rss = static_cast<HSRegexScanState*>(dss->GetRegexScanState());
     HSRegexScanState* lss = static_cast<HSRegexScanState*>(dss->GetLitScanState());
-
-    if (hs_scan(regexEngine_->GetDatabase(), input, ilen, 0, rss->GetScratch(), regexEvent,
-                dsm) != HS_SUCCESS) {
-        printf("ERROR FROM SCAN!!!");
+    if (regexEngine_->GetItemCount() > 0) {
+        if (hs_scan(regexEngine_->GetDatabase(), input, ilen, 0, rss->GetScratch(), regexEvent,
+                    dsm) != HS_SUCCESS) {
+            printf("REGEX ERROR FROM SCAN!!!");
+        }
     }
 
-    if (hs_scan(litRegexEngine_->GetDatabase(), normalized, nlen, 0, lss->GetScratch(), literalEvent,
-                dsm) != HS_SUCCESS) {
-        printf("ERROR FROM SCAN!!!");
+    if (litRegexEngine_->GetItemCount() > 0) {
+        if (hs_scan(litRegexEngine_->GetDatabase(), normalized, nlen, 0, lss->GetScratch(), literalEvent,
+                    dsm) != HS_SUCCESS) {
+            printf("LIT ERROR FROM SCAN!!!");
+        }
     }
 }
 

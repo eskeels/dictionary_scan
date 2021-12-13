@@ -11,7 +11,7 @@ class Dictionaries {
         const Dictionary* GetDictionary(const std::string& name) const;
         // Get dictionary by id
         const Dictionary* GetDictionary(uint16_t id) const;
-        // Get first dictionary of the collection. Follow up with
+        // Get first dictionary of the ection. Follow up with
         // a call to GetNextDictionary() to iterate through.
         const Dictionary* GetFirstDictionary(size_t& idx) const {
             idx = 0;

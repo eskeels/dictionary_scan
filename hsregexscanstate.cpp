@@ -19,7 +19,9 @@ namespace DLP {
     }
 
     HSRegexScanState::~HSRegexScanState() {
-        hs_free_scratch(scratch_);
+        if (scratch_) {
+            hs_free_scratch(scratch_);
+        }
     }
 }
 

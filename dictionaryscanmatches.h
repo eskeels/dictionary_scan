@@ -8,6 +8,31 @@ class IScanMatches {
         virtual ~IScanMatches() {};
 };
 
+class Match {
+    public:
+        Match(const IDictionaryItem* dictionaryItem, unsigned long long from, unsigned long long to)
+            : dictionaryItem_(dictionaryItem),
+              from_(from),
+              gotFrom_(true),
+              to_(to)
+        {
+        }
+
+        Match(const IDictionaryItem* dictionaryItem, unsigned long long to)
+            : dictionaryItem_(dictionaryItem),
+              from_(0),
+              gotFrom_(false),
+              to_(to)
+        {
+        }
+
+    protected:
+        const IDictionaryItem* dictionaryItem_;
+        unsigned long long from_;
+        bool gotFrom_ = false;
+        unsigned long long to_;
+};
+
 class DictionaryScanMatches : public IScanMatches {
     public:
         DictionaryScanMatches(const Dictionaries* dictionaries);
@@ -21,6 +46,7 @@ class DictionaryScanMatches : public IScanMatches {
         const Dictionaries* dictionaries_;
         const char* input_;
         size_t len_;
+        std::vector<Match> matches_;
 };
 
 }

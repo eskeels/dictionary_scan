@@ -12,6 +12,7 @@ namespace DLP {
 
     void LitRegexEngine::RegisterDictionaryItem(uint16_t dictionaryId, const IDictionaryItem* di) {
         if (di->IsLiteral()) {
+            itemCount_++;
             expressions_.push_back(di->GetRegex().c_str());
             uint16_t termId = di->GetId();
             // each id holds the dictionary id and term id
