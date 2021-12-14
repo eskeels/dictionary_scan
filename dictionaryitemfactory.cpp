@@ -15,6 +15,16 @@ IDictionaryItem* DictionaryItemFactory::CreateRegex(const std::string& regex, in
                        regex );
 }
 
+IDictionaryItem* DictionaryItemFactory::CreateLiteral(const std::string& literal, int16_t* score, bool* distinct, bool* partial, bool* caseSensitive)
+{
+    return new Literal( (score != nullptr ? *score : defaultScore_),
+                        (distinct != nullptr ? *distinct : defaultDistinct_),
+                        (partial != nullptr ? *partial : defaultPartial_),
+                        (caseSensitive != nullptr ? *caseSensitive : defaultCaseSensitive_),
+                         GetId(),
+                         literal );
+}
+
 /*
 // Phrase
 // \bthe[\W\n]{1,10}cat\b

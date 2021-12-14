@@ -46,7 +46,7 @@ void AddDictionary( DLP::Dictionaries& ds,
 
     DLP::Dictionary* d = new Dictionary(name, id, 1);
     for ( auto& t : terms ) { 
-        d->Add(ifactory.CreateRegex(t,nullptr,nullptr,nullptr,nullptr));
+        d->Add(ifactory.CreateLiteral(t,nullptr,nullptr,nullptr,nullptr));
     }
     ds.Add(d);
 }
