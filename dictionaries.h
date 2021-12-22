@@ -11,6 +11,8 @@ class Dictionaries {
         const Dictionary* GetDictionary(const std::string& name) const;
         // Get dictionary by id
         const Dictionary* GetDictionary(uint16_t id) const;
+        // Get the dictionary item by ids
+        const IDictionaryItem* GetDictionaryItem(uint16_t dictionaryId, uint16_t itemId) const;
         // Get first dictionary of the ection. Follow up with
         // a call to GetNextDictionary() to iterate through.
         const Dictionary* GetFirstDictionary(size_t& idx) const {
@@ -25,7 +27,8 @@ class Dictionaries {
     protected:
         // all the dictionaries
         std::vector<const Dictionary*> dictionaries_;
-        // dictionary id to offset in above vector        
+        // dictionary id to offset in above vector
+        // NB: this limits us to 65k dictionaries
         std::unordered_map<uint16_t,uint16_t> dictionariesIndx_;
         // dictionary name to offset
         std::unordered_map<std::string,uint16_t> dictionariesNameIndx_;

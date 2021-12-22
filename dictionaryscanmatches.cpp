@@ -16,26 +16,42 @@ void DictionaryScanMatches::SetInputBuffer(const char* input, size_t len) {
     len_ = len;
 }
 
-void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long from, unsigned long long to) {
-   std::cout << dictionaryId << " " << itemId << " " << from << " " << to << std::endl;
+void DictionaryScanMatches::UpdateDictionariesMatchIndex(uint16_t dictionaryId) {
+    uint32_t idx = (uint32_t)matches_.size()-1;
+    auto it = dictionariesMatchIndx_.find(dictionaryId);
+    if (it == dictionariesMatchIndx_.end()) {
+        std::cout << "Inserting" << std::endl;
+        // not found so create
+        dictionariesMatchIndx_.insert({dictionaryId,{(uint32_t)idx}});
+    } else {
+        std::cout << "Adding" << std::endl;
+        it->second.push_back((uint32_t)idx);
+    }
+}
 
-    const Dictionary* dictionary = dictionaries_->GetDictionary(dictionaryId);
-    if (dictionary) {
-        const IDictionaryItem* dictionaryItem = dictionary->GetDictionaryItem(itemId);
-        if (dictionaryItem) {
-           matches_.push_back(Match(dictionaryItem, from, to));
-        }
+void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long from, unsigned long long to) {
+    std::cout << dictionaryId << " " << itemId << " " << from << " " << to << std::endl;
+
+    const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
+    if (dictionaryItem) {
+        matches_.push_back(Match(dictionaryItem, from, to));
+        UpdateDictionariesMatchIndex(dictionaryId);
+    } else {
+        // TODO: Trying to add a match with no corresponding entry in dictionary
+        // raise error / warning
     }
 }
 
 void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long to) {
-   std::cout << dictionaryId << " " << itemId << " " << " " << to << std::endl;
-    const Dictionary* dictionary = dictionaries_->GetDictionary(dictionaryId);
-    if (dictionary) {
-        const IDictionaryItem* dictionaryItem = dictionary->GetDictionaryItem(itemId);
-        if (dictionaryItem) {
-           matches_.push_back(Match(dictionaryItem, to));
-        }
+    std::cout << dictionaryId << " " << itemId << " " << " " << to << std::endl;
+
+    const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
+    if (dictionaryItem) {
+        matches_.push_back(Match(dictionaryItem, to));
+        UpdateDictionariesMatchIndex(dictionaryId);
+    } else {
+        // TODO: Trying to add a match with no corresponding entry in dictionary
+        // raise error / warning
     }
 }
 

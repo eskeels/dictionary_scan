@@ -40,8 +40,7 @@ class DictionaryItemFactory {
 
         DictionaryItem CreatePhrase(int16_t* score, bool* distinct, bool* caseSensitive, uint8_t distance, std::vector<std::string> terms);
         DictionaryItem CreateProximity(int16_t* score, bool* distinct, bool* caseSensitive, uint8_t distance, std::vector<std::string> terms);
-        DictionaryItem CreateRegex(int16_t* score, bool* distinct);
-                 
+
     protected:
         int16_t defaultScore_;
         bool defaultDistinct_;

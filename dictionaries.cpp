@@ -42,6 +42,15 @@ const Dictionary* Dictionaries::GetDictionary(uint16_t id) const {
     return dictionaries_[pos->second];
 }
 
+const IDictionaryItem* Dictionaries::GetDictionaryItem(uint16_t dictionaryId, uint16_t itemId) const {
+    const Dictionary* dictionary = GetDictionary(dictionaryId);
+    if (dictionary) {
+        return dictionary->GetDictionaryItem(itemId);
+    }
+
+    return nullptr;
+}
+ 
 const Dictionary* Dictionaries::GetNextDictionary(size_t& idx) const {
     if (idx >= dictionaries_.size()){
         return nullptr;

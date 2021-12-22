@@ -59,7 +59,8 @@ DictionaryItem DictionaryItemFactory::CreatePhrase(int16_t* score, bool* distinc
 
     return i;
 }
-
+*/
+/*
 // Proximity
 // \b(the|cat|mat)[\W\n]{1,10}(the|cat|mat)\b
 DictionaryItem DictionaryItemFactory::CreateProximity(int16_t* score, bool* distinct, bool* caseSensitive, uint8_t distance, std::vector<std::string> terms)

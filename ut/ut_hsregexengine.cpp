@@ -21,6 +21,7 @@ bool verifyRegex( const std::string& regex, const std::string& txt, bool trigger
     std::regex rgx(r,f);
     return (trigger == std::regex_search(txt, rgx));
 }
+
 void AddDictionary( DLP::Dictionaries& ds,
                     const std::string& name,
                     uint16_t id,
@@ -29,6 +30,7 @@ void AddDictionary( DLP::Dictionaries& ds,
                     bool partial = false,
                     bool distiinct = false,
                     bool caseSens = true );
+
 void AddDictionary( DLP::Dictionaries& ds,
                     const std::string& name,
                     uint16_t id,
@@ -37,12 +39,13 @@ void AddDictionary( DLP::Dictionaries& ds,
                     bool partial,
                     bool distiinct,
                     bool caseSens) {
+
     DLP::DictionaryItemFactory ifactory;
     ifactory.SetDefaults(score,
-                         distiinct,   // distinct
-                         partial, // partial
-                         caseSens,    // case sensitive
-                         10);     // distance
+            distiinct,   // distinct
+            partial, // partial
+            caseSens,    // case sensitive
+            10);     // distance
 
     DLP::Dictionary* d = new Dictionary(name, id, 1);
     for ( auto& t : terms ) { 
@@ -50,6 +53,7 @@ void AddDictionary( DLP::Dictionaries& ds,
     }
     ds.Add(d);
 }
+
 std::string getWord();
 
 std::string getWord() {
@@ -71,23 +75,23 @@ return tmp;//+"\\W";
 
 TEST (DictionaryItemFactoryTest, AllDefault) {
     DLP::Dictionaries ds;
-std::vector<std::string> words;
-for (int i = 0; i < 300; ++i) {
-words.push_back(getWord());
-}
-words.push_back("sat");
+    std::vector<std::string> words;
+    for (int i = 0; i < 300; ++i) {
+        words.push_back(getWord());
+    }
+    words.push_back("sat");
 
     AddDictionary( ds, "animals", 1 , words );
-/*
-    DLP::HSRegexEngine hsre;
-    hsre.Register(&ds);
-    hsre.Initialize();
-    IRegexScanState* rss = hsre.CreateRegexScanState();
-    std::cout << "Created scan state" << std::endl;
-    hsre.Serialize();
+    /*
+       DLP::HSRegexEngine hsre;
+       hsre.Register(&ds);
+       hsre.Initialize();
+       IRegexScanState* rss = hsre.CreateRegexScanState();
+       std::cout << "Created scan state" << std::endl;
+       hsre.Serialize();
 
-    delete rss;
-*/
+       delete rss;
+     */
     std::vector<uint16_t> dictionaryIds;
 
     DLP::DictionaryScanner dscanner(&ds);
@@ -99,11 +103,11 @@ words.push_back("sat");
     DLP::DictionaryScanMatches dsm(&ds);
     dscanner.Scan(&dsm, ss, 0, input.c_str(), input.size(), input.c_str(), input.size());
 
-/*  DLP::LitRegexEngine chre;
-    chre.Register(&ds);
-    chre.Initialize();
-    chre.Serialize();
-*/
+    /*  DLP::LitRegexEngine chre;
+        chre.Register(&ds);
+        chre.Initialize();
+        chre.Serialize();
+     */
 }
 
 
