@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include "dictionaries.h"
 
 namespace DLP {
@@ -100,8 +102,12 @@ class DictionaryScanMatches : public IScanMatches {
             return it->second.size();
         }
 
+        const std::set<uint16_t>& GetMatchedDictionaryIds() const {
+            return  matchedDictionaryIds_;
+        }
+
     protected:
-        void UpdateDictionariesMatchIndex(uint16_t dictionaryId);
+        void UpdateDictionariesMatchIndex(Match&& match, uint16_t dictionaryId);
 
         const Dictionaries* dictionaries_;
         const char* input_;
@@ -110,6 +116,8 @@ class DictionaryScanMatches : public IScanMatches {
         // dictionary id to offset in matches_ index. So we can
         // find all matches for a dictionary
         std::unordered_map<uint16_t, std::vector<uint32_t>> dictionariesMatchIndx_;
+        // dictionary ids that have matched
+        std::set<uint16_t> matchedDictionaryIds_;
 };
 
 }
