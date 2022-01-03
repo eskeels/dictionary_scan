@@ -40,6 +40,10 @@ class Match {
             return (size_t) to_;
         }
 
+        int16_t GetScore() const {
+            return dictionaryItem_->GetScore();
+        }
+
     protected:
         const IDictionaryItem* dictionaryItem_;
         unsigned long long from_;
@@ -106,8 +110,12 @@ class DictionaryScanMatches : public IScanMatches {
             return  matchedDictionaryIds_;
         }
 
+        int64_t GetTotalScore() const {
+            return score_;
+        }
+
     protected:
-        void UpdateDictionariesMatchIndex(Match&& match, uint16_t dictionaryId);
+        void RecordMatch(Match&& match, uint16_t dictionaryId);
 
         const Dictionaries* dictionaries_;
         const char* input_;
@@ -118,6 +126,10 @@ class DictionaryScanMatches : public IScanMatches {
         std::unordered_map<uint16_t, std::vector<uint32_t>> dictionariesMatchIndx_;
         // dictionary ids that have matched
         std::set<uint16_t> matchedDictionaryIds_;
+        // total score for the scan
+        int64_t score_;
+        // dictionary id to score
+        std::unordered_map<uint16_t,int64_t> dictionaryScores_; 
 };
 
 }

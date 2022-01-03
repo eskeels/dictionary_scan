@@ -5,7 +5,8 @@
 namespace DLP {
 
 DictionaryScanMatches::DictionaryScanMatches(const Dictionaries* dictionaries)
-    : dictionaries_(dictionaries) {
+    : dictionaries_(dictionaries),
+      score_(0) {
 }
 
 DictionaryScanMatches::~DictionaryScanMatches() {
@@ -16,8 +17,9 @@ void DictionaryScanMatches::SetInputBuffer(const char* input, size_t len) {
     len_ = len;
 }
 
-void DictionaryScanMatches::UpdateDictionariesMatchIndex(Match&& match, uint16_t dictionaryId) {
+void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
     matches_.push_back(match);
+    score_ += match.GetScore();
     matchedDictionaryIds_.insert(dictionaryId);
     uint32_t idx = (uint32_t)matches_.size()-1;
     auto it = dictionariesMatchIndx_.find(dictionaryId);
@@ -37,7 +39,7 @@ void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, 
     const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
     if (dictionaryItem) {
 //        matches_.push_back(Match(dictionaryItem, from, to));
-        UpdateDictionariesMatchIndex(Match(dictionaryItem, from, to),dictionaryId);
+        RecordMatch(Match(dictionaryItem, from, to),dictionaryId);
     } else {
         // TODO: Trying to add a match with no corresponding entry in dictionary
         // raise error / warning
@@ -50,7 +52,7 @@ void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, 
     const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
     if (dictionaryItem) {
 //        matches_.push_back(Match(dictionaryItem, to));
-        UpdateDictionariesMatchIndex(Match(dictionaryItem, to), dictionaryId);
+        RecordMatch(Match(dictionaryItem, to), dictionaryId);
     } else {
         // TODO: Trying to add a match with no corresponding entry in dictionary
         // raise error / warning
