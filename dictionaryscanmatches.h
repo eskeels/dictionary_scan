@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include <unordered_map>
 
 #include "dictionaries.h"
 
@@ -114,8 +115,11 @@ class DictionaryScanMatches : public IScanMatches {
             return score_;
         }
 
+        int64_t GetScore(uint16_t dictionaryId) const; 
+
     protected:
         void RecordMatch(Match&& match, uint16_t dictionaryId);
+        void RecordScore(const Match& match, uint16_t dictionaryId);
 
         const Dictionaries* dictionaries_;
         const char* input_;
@@ -130,6 +134,8 @@ class DictionaryScanMatches : public IScanMatches {
         int64_t score_;
         // dictionary id to score
         std::unordered_map<uint16_t,int64_t> dictionaryScores_; 
+        // set of all distinct matches. Used to record distinct triggers. 
+        std::set<std::pair<uint16_t,uint16_t>> distinctMatches_;
 };
 
 }

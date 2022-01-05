@@ -17,18 +17,39 @@ void DictionaryScanMatches::SetInputBuffer(const char* input, size_t len) {
     len_ = len;
 }
 
+int64_t DictionaryScanMatches::GetScore(uint16_t dictionaryId) const {
+    auto it = dictionaryScores_.find(dictionaryId);
+    if (it != dictionaryScores_.end()) {
+        return it->second;
+    }
+
+    return 0;
+} 
+
+void DictionaryScanMatches::RecordScore(const Match& match, uint16_t dictionaryId) {
+     score_ += match.GetScore();
+   
+auto it = dictionaryScores_.find(dictionaryId);
+    if (it == dictionaryScores_.end()) {
+        // insert
+        dictionaryScores_.insert(std::make_pair(dictionaryId,match.GetScore()));
+    } else {
+        // update
+        it->second += match.GetScore();
+    }
+}
+
 void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
-    matches_.push_back(match);
-    score_ += match.GetScore();
+    RecordScore(match, dictionaryId);
     matchedDictionaryIds_.insert(dictionaryId);
+
+    matches_.push_back(match);
     uint32_t idx = (uint32_t)matches_.size()-1;
     auto it = dictionariesMatchIndx_.find(dictionaryId);
     if (it == dictionariesMatchIndx_.end()) {
-        std::cout << "Inserting" << std::endl;
         // not found so create
         dictionariesMatchIndx_.insert({dictionaryId,{(uint32_t)idx}});
     } else {
-        std::cout << "Adding" << std::endl;
         it->second.push_back((uint32_t)idx);
     }
 }
@@ -38,7 +59,6 @@ void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, 
 
     const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
     if (dictionaryItem) {
-//        matches_.push_back(Match(dictionaryItem, from, to));
         RecordMatch(Match(dictionaryItem, from, to),dictionaryId);
     } else {
         // TODO: Trying to add a match with no corresponding entry in dictionary
@@ -51,7 +71,6 @@ void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, 
 
     const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
     if (dictionaryItem) {
-//        matches_.push_back(Match(dictionaryItem, to));
         RecordMatch(Match(dictionaryItem, to), dictionaryId);
     } else {
         // TODO: Trying to add a match with no corresponding entry in dictionary

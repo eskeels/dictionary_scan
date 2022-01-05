@@ -20,7 +20,6 @@ TEST (DictionaryTermId, TestNoMatch) {
     } 
 
     DLP::DictionaryScanMatches dsm(&ds);
-    // RecordMatch(dictionaryId, itemId, from, to);
 
     size_t idx;
     ASSERT_EQ(0,dsm.GetMatchCount(1));
@@ -33,16 +32,18 @@ TEST (DictionaryTermId, TestNoMatch) {
 TEST (DictionaryTermId, Test1) {
     DLP::Dictionaries ds;
     DLP::DictionaryItemFactory dif;
+    int16_t score1 = 1;
+    int16_t score3 = 3;
     {
         DLP::Dictionary* d = new DLP::Dictionary("A",1,1);
-        d->Add(dif.CreateLiteral("aaa", nullptr, nullptr, nullptr, nullptr));
+        d->Add(dif.CreateLiteral("aaa", &score3, nullptr, nullptr, nullptr));
         ds.Add(d);
     }
     {
         dif.ResetId();
         DLP::Dictionary* d = new DLP::Dictionary("B",2,1);
-        d->Add(dif.CreateLiteral("bbb1", nullptr, nullptr, nullptr, nullptr));
-        d->Add(dif.CreateLiteral("bbb2", nullptr, nullptr, nullptr, nullptr));
+        d->Add(dif.CreateLiteral("bbb1", &score1, nullptr, nullptr, nullptr));
+        d->Add(dif.CreateLiteral("bbb2", &score3, nullptr, nullptr, nullptr));
         ds.Add(d);
     } 
 
@@ -52,6 +53,10 @@ TEST (DictionaryTermId, Test1) {
     dsm.RecordMatch(1, 1, 15, 20);
     dsm.RecordMatch(2, 1, 7, 12);
     dsm.RecordMatch(2, 2, 23, 27);
+
+    EXPECT_EQ(6, dsm.GetScore(1));
+    EXPECT_EQ(4, dsm.GetScore(2));
+    EXPECT_EQ(10, dsm.GetTotalScore());
 
     size_t idx;
     ASSERT_EQ(2,dsm.GetMatchCount(1));
@@ -86,6 +91,12 @@ TEST (DictionaryTermId, Test1) {
         ds.Add(d);
     }
     dsm.RecordMatch(3, 1, 123, 127);
+
+    EXPECT_EQ(6, dsm.GetScore(1));
+    EXPECT_EQ(4, dsm.GetScore(2));
+    EXPECT_EQ(1, dsm.GetScore(3));
+    EXPECT_EQ(11, dsm.GetTotalScore());
+
     m = dsm.GetFirstMatch(idx,3);
     EXPECT_EQ(123, m->GetFrom());
     EXPECT_EQ(127, m->GetTo());
@@ -113,6 +124,11 @@ TEST (DictionaryTermId, TestDupe) {
 
     dsm.RecordMatch(2, 1, 7, 12);
     dsm.RecordMatch(2, 1, 7, 12);
+
+    EXPECT_EQ(2, dsm.GetScore(1));
+    EXPECT_EQ(2, dsm.GetScore(2));
+    EXPECT_EQ(0, dsm.GetScore(3)); // No such dictionary
+    EXPECT_EQ(4, dsm.GetTotalScore());
 
     size_t idx;
     ASSERT_EQ(2,dsm.GetMatchCount(1));
@@ -156,6 +172,9 @@ TEST (DictionaryTermId, Test100) {
         dsm.RecordMatch(1, 1, i, i+5);
     }
 
+    EXPECT_EQ(100, dsm.GetScore(1));
+    EXPECT_EQ(100, dsm.GetTotalScore());
+
     size_t idx;
     ASSERT_EQ(100,dsm.GetMatchCount(1));
     DLP::Match* m;
@@ -170,36 +189,6 @@ TEST (DictionaryTermId, Test100) {
         EXPECT_EQ(i+5, m->GetTo());
     }
     EXPECT_EQ(nullptr, dsm.GetNextMatch(idx,1));
-
-/*
-    m = dsm.GetNextMatch(idx,1);
-    EXPECT_EQ(15, m->GetFrom());
-    EXPECT_EQ(20, m->GetTo());
-    
-    */
-/*
-    ASSERT_EQ(2,dsm.GetMatchCount(2));
-
-    m = dsm.GetFirstMatch(idx,2);
-    EXPECT_EQ(7, m->GetFrom());
-    EXPECT_EQ(12, m->GetTo());
-
-    m = dsm.GetNextMatch(idx,2);
-    EXPECT_EQ(23, m->GetFrom());
-    EXPECT_EQ(27, m->GetTo());
-    
-    EXPECT_EQ(nullptr, dsm.GetNextMatch(idx,2));
-
-    {
-        dif.ResetId();
-        DLP::Dictionary* d = new DLP::Dictionary("C",3,1);
-        d->Add(dif.CreateLiteral("ccc1", nullptr, nullptr, nullptr, nullptr));
-        ds.Add(d);
-    }
-    dsm.RecordMatch(3, 1, 123, 127);
-    m = dsm.GetFirstMatch(idx,3);
-    EXPECT_EQ(123, m->GetFrom());
-    EXPECT_EQ(127, m->GetTo());*/
 }
 
 

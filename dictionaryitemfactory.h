@@ -7,7 +7,7 @@ namespace DLP {
 class DictionaryItemFactory {
     public:
         DictionaryItemFactory() : 
-            defaultScore_(0),
+            defaultScore_(1),
             defaultDistinct_(false),
             itemId_(0),
             defaultPartial_(false),
