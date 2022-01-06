@@ -45,6 +45,14 @@ class Match {
             return dictionaryItem_->GetScore();
         }
 
+        int16_t GetItemId() const {
+            return dictionaryItem_->GetId();
+        }
+
+        bool IsDistinct() const {
+            return dictionaryItem_->IsDistinct();
+        }
+
     protected:
         const IDictionaryItem* dictionaryItem_;
         unsigned long long from_;
@@ -120,6 +128,7 @@ class DictionaryScanMatches : public IScanMatches {
     protected:
         void RecordMatch(Match&& match, uint16_t dictionaryId);
         void RecordScore(const Match& match, uint16_t dictionaryId);
+        bool CheckDistinct(const Match& match, uint16_t dictionaryId);
 
         const Dictionaries* dictionaries_;
         const char* input_;

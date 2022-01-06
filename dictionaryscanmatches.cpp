@@ -24,12 +24,30 @@ int64_t DictionaryScanMatches::GetScore(uint16_t dictionaryId) const {
     }
 
     return 0;
-} 
+}
+ 
+bool DictionaryScanMatches::CheckDistinct(const Match& match, uint16_t dictionaryId) {
+    if (match.IsDistinct()) {
+        auto it = distinctMatches_.find(std::make_pair(dictionaryId,match.GetItemId()));
+        if (it == distinctMatches_.end()) {
+            // insert
+            distinctMatches_.insert(std::make_pair(dictionaryId,match.GetScore()));
+            // distinct but first hit
+            return false;
+         } else {
+            // distinct and already in set
+            return true;
+         }
+    }
+    // not distinct so just return
+    return false;
+}
 
 void DictionaryScanMatches::RecordScore(const Match& match, uint16_t dictionaryId) {
-     score_ += match.GetScore();
-   
-auto it = dictionaryScores_.find(dictionaryId);
+    // update overall score
+    score_ += match.GetScore();
+    // update score for the dictionary 
+    auto it = dictionaryScores_.find(dictionaryId);
     if (it == dictionaryScores_.end()) {
         // insert
         dictionaryScores_.insert(std::make_pair(dictionaryId,match.GetScore()));
@@ -40,6 +58,11 @@ auto it = dictionaryScores_.find(dictionaryId);
 }
 
 void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
+    if (CheckDistinct(match, dictionaryId)) {
+        // match was distinct and we already have a hit
+        return;
+    }
+
     RecordScore(match, dictionaryId);
     matchedDictionaryIds_.insert(dictionaryId);
 
