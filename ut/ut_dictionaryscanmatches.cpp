@@ -53,6 +53,10 @@ TEST (DictionaryTermId, Test1) {
     dsm.RecordMatch(1, 1, 15, 20);
     dsm.RecordMatch(2, 1, 7, 12);
     dsm.RecordMatch(2, 2, 23, 27);
+    
+    std::set<uint16_t> dictionaryIds;
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets(dictionaryIds, true /* all */, 5 /* count */, 3 /* affix */, snippets);
 
     EXPECT_EQ(6, dsm.GetScore(1));
     EXPECT_EQ(4, dsm.GetScore(2));

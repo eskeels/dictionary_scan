@@ -6,7 +6,7 @@ namespace DLP {
 
 DictionaryScanMatches::DictionaryScanMatches(const Dictionaries* dictionaries)
     : dictionaries_(dictionaries),
-      score_(0) {
+      score_(0){
 }
 
 DictionaryScanMatches::~DictionaryScanMatches() {
@@ -57,6 +57,24 @@ void DictionaryScanMatches::RecordScore(const Match& match, uint16_t dictionaryI
     }
 }
 
+void DictionaryScanMatches::CreateMatchSnippets(std::set<uint16_t> dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string> snippets) {
+    std::cout << "CreateMatchSnippets" << count << affix << std::endl;
+    auto d = dictionariesMatchIndx_.begin();
+    while (d != dictionariesMatchIndx_.end()) {
+        uint16_t did = d->first;
+        if (all || (dictionaryIds.find(did) != dictionaryIds.end())) {
+            auto& matches = d->second;
+            std::cout << "Dictionary id is " << did << std::endl;
+            for (size_t i=0; (i <= count) && (i < matches.size()); ++i) {
+                auto& match = matches_[matches[i]];
+                std::cout << match.GetFrom() << " " <<  match.GetTo() << std::endl;
+                snippets.push_back("TEST");
+            }
+        }
+        d++;
+    }
+}
+
 void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
     if (CheckDistinct(match, dictionaryId)) {
         // match was distinct and we already have a hit
@@ -68,6 +86,7 @@ void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
 
     matches_.push_back(match);
     uint32_t idx = (uint32_t)matches_.size()-1;
+    
     auto it = dictionariesMatchIndx_.find(dictionaryId);
     if (it == dictionariesMatchIndx_.end()) {
         // not found so create
@@ -78,7 +97,7 @@ void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
 }
 
 void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long from, unsigned long long to) {
-    std::cout << dictionaryId << " " << itemId << " " << from << " " << to << std::endl;
+//    std::cout << dictionaryId << " " << itemId << " " << from << " " << to << std::endl;
 
     const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
     if (dictionaryItem) {
@@ -90,7 +109,7 @@ void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, 
 }
 
 void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long to) {
-    std::cout << dictionaryId << " " << itemId << " " << " " << to << std::endl;
+//    std::cout << dictionaryId << " " << itemId << " " << " " << to << std::endl;
 
     const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
     if (dictionaryItem) {

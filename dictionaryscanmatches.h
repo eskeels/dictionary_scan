@@ -125,6 +125,7 @@ class DictionaryScanMatches : public IScanMatches {
 
         int64_t GetScore(uint16_t dictionaryId) const; 
 
+        void CreateMatchSnippets(std::set<uint16_t> dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string> snippets);
     protected:
         void RecordMatch(Match&& match, uint16_t dictionaryId);
         void RecordScore(const Match& match, uint16_t dictionaryId);
@@ -144,7 +145,7 @@ class DictionaryScanMatches : public IScanMatches {
         // dictionary id to score
         std::unordered_map<uint16_t,int64_t> dictionaryScores_; 
         // set of all distinct matches. Used to record distinct triggers. 
+        // dictionary id <--> term id
         std::set<std::pair<uint16_t,uint16_t>> distinctMatches_;
 };
-
 }
