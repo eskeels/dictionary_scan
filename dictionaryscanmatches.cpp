@@ -57,7 +57,34 @@ void DictionaryScanMatches::RecordScore(const Match& match, uint16_t dictionaryI
     }
 }
 
-void DictionaryScanMatches::CreateMatchSnippets(std::set<uint16_t> dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string> snippets) {
+std::string DictionaryScanMatches::GetSnippet(const Match& match, size_t affix) {
+    size_t startPos = 0;
+    size_t endPos = match.GetTo();
+    size_t prefix = affix;
+    size_t suffix = affix;
+    if (match.HasFrom()) {
+        startPos = match.GetFrom();
+    } else {
+        startPos = match.GetTo();
+    }
+    
+    if (prefix < startPos) {
+        startPos -= prefix;
+    } else {
+        startPos = 0;
+    }
+
+    if (endPos+suffix <= len_) {
+        endPos += suffix;
+    } else {
+        endPos = len_;
+    }
+
+    std::string s(input_ + startPos, input_ + endPos);
+    return s;
+}
+
+void DictionaryScanMatches::CreateMatchSnippets(std::set<uint16_t> dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string>& snippets) {
     std::cout << "CreateMatchSnippets" << count << affix << std::endl;
     auto d = dictionariesMatchIndx_.begin();
     while (d != dictionariesMatchIndx_.end()) {
@@ -65,10 +92,14 @@ void DictionaryScanMatches::CreateMatchSnippets(std::set<uint16_t> dictionaryIds
         if (all || (dictionaryIds.find(did) != dictionaryIds.end())) {
             auto& matches = d->second;
             std::cout << "Dictionary id is " << did << std::endl;
-            for (size_t i=0; (i <= count) && (i < matches.size()); ++i) {
+            for (size_t i=0; (i <= count) && (i < matches.size()) && (snippets.size() <= count) ; ++i) {
                 auto& match = matches_[matches[i]];
+                std::string s = GetSnippet(match, affix);
+                if (!s.empty()) {
+                    std::cout << "Snip is [" << s << "]" << std::endl;
+                    snippets.push_back(std::move(s));
+                }
                 std::cout << match.GetFrom() << " " <<  match.GetTo() << std::endl;
-                snippets.push_back("TEST");
             }
         }
         d++;

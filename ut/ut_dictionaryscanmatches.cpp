@@ -54,10 +54,6 @@ TEST (DictionaryTermId, Test1) {
     dsm.RecordMatch(2, 1, 7, 12);
     dsm.RecordMatch(2, 2, 23, 27);
     
-    std::set<uint16_t> dictionaryIds;
-    std::vector<std::string> snippets;
-    dsm.CreateMatchSnippets(dictionaryIds, true /* all */, 5 /* count */, 3 /* affix */, snippets);
-
     EXPECT_EQ(6, dsm.GetScore(1));
     EXPECT_EQ(4, dsm.GetScore(2));
     EXPECT_EQ(10, dsm.GetTotalScore());
@@ -318,5 +314,62 @@ TEST (DictionaryTermId, Test100WithDistinct) {
     EXPECT_EQ(5, m->GetTo());
 
     EXPECT_EQ(nullptr, dsm.GetNextMatch(idx,1));
+}
+
+TEST (DictionaryTermId, TestSnippet) {
+    DLP::Dictionaries ds;
+    DLP::DictionaryItemFactory dif;
+    int16_t score1 = 1;
+    int16_t score3 = 3;
+    {
+        DLP::Dictionary* d = new DLP::Dictionary("A",1,1);
+        d->Add(dif.CreateLiteral("aaa", &score3, nullptr, nullptr, nullptr));
+        ds.Add(d);
+    }
+    {
+        dif.ResetId();
+        DLP::Dictionary* d = new DLP::Dictionary("B",2,1);
+        d->Add(dif.CreateLiteral("bbb1", &score1, nullptr, nullptr, nullptr));
+        d->Add(dif.CreateLiteral("bbb2", &score3, nullptr, nullptr, nullptr));
+        ds.Add(d);
+    } 
+
+    std::string s("the aaa the bbb1 and bbb2");
+    DLP::DictionaryScanMatches dsm(&ds);
+    dsm.SetInputBuffer(s.c_str(), s.size());
+    // RecordMatch(dictionaryId, itemId, from, to);
+    dsm.RecordMatch(1, 1, 4, 7);
+    dsm.RecordMatch(2, 2, 12, 16);
+    dsm.RecordMatch(2, 2, 21, 25);
+
+    { 
+    std::set<uint16_t> dictionaryIds;
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets(dictionaryIds, true /* all */, 5 /* count */, 0 /* affix */, snippets);
+
+    EXPECT_EQ("bbb1", snippets[0]);
+    EXPECT_EQ("bbb2", snippets[1]);
+    EXPECT_EQ("aaa", snippets[2]);
+    }
+
+    { 
+    std::set<uint16_t> dictionaryIds;
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets(dictionaryIds, true /* all */, 5 /* count */, 1 /* affix */, snippets);
+
+    EXPECT_EQ(" bbb1 ", snippets[0]);
+    EXPECT_EQ(" bbb2", snippets[1]);
+    EXPECT_EQ(" aaa ", snippets[2]);
+    }
+
+    { 
+    std::set<uint16_t> dictionaryIds;
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets(dictionaryIds, true /* all */, 5 /* count */, 3 /* affix */, snippets);
+
+    EXPECT_EQ("he bbb1 an", snippets[0]);
+    EXPECT_EQ("nd bbb2", snippets[1]);
+    EXPECT_EQ("he aaa th", snippets[2]);
+    }
 }
 

@@ -26,7 +26,7 @@ TEST (DictionaryOneItem, AllDefault) {
     AddDictionary( ds, "words", 1 , { "sat" }, LITERAL );
 
     int64_t totalScore = 0;
-    EXPECT_EQ(true, ScanAndVerify3(ds, "the cat sat on the mat", {{8,10,1}}, totalScore));
+    EXPECT_EQ(true, ScanAndVerify3(ds, "the cat sat on the mat", {{8,11,1}}, totalScore));
     EXPECT_EQ(20, totalScore);
 }
 
@@ -36,8 +36,8 @@ TEST (DictionaryTwoItems, AllDefault) {
 
     EXPECT_EQ(true, ScanAndVerify2(ds,
                                   "the cat sat on the mat",
-                                  {{8,10,1},  // sat
-                                   {19,21,1}} // mat
+                                  {{8,11,1},  // sat
+                                   {19,22,1}} // mat
                                    ));
 }
 
@@ -47,8 +47,8 @@ TEST (DictionaryOneItemTwoTriggers, AllDefault) {
 
     EXPECT_EQ(true, ScanAndVerify2(ds,
                                   "the cat sat on the mat",
-                                  {{0,2,1},   // the
-                                   {15,17,1}} // the
+                                  {{0,3,1},   // the
+                                   {15,18,1}} // the
                                    ));
 }
 
@@ -56,7 +56,7 @@ TEST (DictionaryOneItemRegex, AllDefault) {
     DLP::Dictionaries ds;
     AddDictionary( ds, "regexes", 1 , { R"(\d\d)" }, REGEX );
 
-    EXPECT_EQ(true, ScanAndVerify2(ds, "the 22 cat sat on the mat 11", {{0,5,1},{0,27,1}}));
+    EXPECT_EQ(true, ScanAndVerify2(ds, "the 22 cat sat on the mat 11", {{0,6,1},{0,28,1}}));
 }
 
 TEST (DictionaryTwoLiteralDictionariesThreeTriggers, AllDefault) {
@@ -66,9 +66,9 @@ TEST (DictionaryTwoLiteralDictionariesThreeTriggers, AllDefault) {
 
     EXPECT_EQ(true, ScanAndVerify2(ds,
                                   "goat axe duck",
-                                  {{0,3,1},   // goat
-                                   {5,7,2},   // axe
-                                   {9,12,1}}  // duck
+                                  {{0,4,1},   // goat
+                                   {5,8,2},   // axe
+                                   {9,13,1}}  // duck
                                    ));
 }
 
@@ -79,9 +79,9 @@ TEST (DictionaryTwoLiteralDictionariesDuplicate, AllDefault) {
 
     EXPECT_EQ(true, ScanAndVerify2(ds,
                                   "goat the duck",
-                                  {{0,3,1},   // goat - animals
-                                   {0,3,2},   // goat - also animals
-                                   {9,12,1},  // duck - animals 
-                                   {9,12,2}}  // duck - also animals
+                                  {{0,4,1},   // goat - animals
+                                   {0,4,2},   // goat - also animals
+                                   {9,13,1},  // duck - animals 
+                                   {9,13,2}}  // duck - also animals
                                    ));
 }

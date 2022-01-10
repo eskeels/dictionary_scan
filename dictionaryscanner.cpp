@@ -41,10 +41,6 @@ static int regexEvent(unsigned int id, unsigned long long /*from*/,
                         unsigned long long to, unsigned int /*flags*/, void *ctx) {
 
     DictionaryTermId dti(id);
-    // end position seems to be one after
-    if (to > 0) {
-        --to;
-    }
 
     DictionaryScanMatches* dss = static_cast<DictionaryScanMatches*>(ctx);
     dss->RecordMatch(dti.GetDictionaryId(), dti.GetTermId(), to);
@@ -55,10 +51,6 @@ static int literalEvent(unsigned int id, unsigned long long from,
                         unsigned long long to, unsigned int /*flags*/, void *ctx) {
 
     DictionaryTermId dti(id);
-    // end position seems to be one after
-    if (to > 0) {
-        --to;
-    }
 
     DictionaryScanMatches* dss = static_cast<DictionaryScanMatches*>(ctx);
     dss->RecordMatch(dti.GetDictionaryId(), dti.GetTermId(), from, to);
