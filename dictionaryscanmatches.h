@@ -125,7 +125,7 @@ class DictionaryScanMatches : public IScanMatches {
 
         int64_t GetScore(uint16_t dictionaryId) const; 
 
-        void CreateMatchSnippets(std::set<uint16_t> dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string>& snippets);
+        void CreateMatchSnippets(const std::set<uint16_t>& dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string>& snippets);
     protected:
         void RecordMatch(Match&& match, uint16_t dictionaryId);
         void RecordScore(const Match& match, uint16_t dictionaryId);

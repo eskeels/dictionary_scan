@@ -60,6 +60,7 @@ static int literalEvent(unsigned int id, unsigned long long from,
 void DictionaryScanner::Scan(IScanMatches* sm, IScanState* ss, size_t /*offset*/, const char * input, size_t ilen, const char * normalized, size_t nlen) const {
     // scan with regex engines 
     DictionaryScanMatches* dsm = static_cast<DictionaryScanMatches*>(sm);
+    dsm->SetInputBuffer(input, ilen);
     DictionaryScanState* dss = static_cast<DictionaryScanState*>(ss);
     HSRegexScanState* rss = static_cast<HSRegexScanState*>(dss->GetRegexScanState());
     HSRegexScanState* lss = static_cast<HSRegexScanState*>(dss->GetLitScanState());

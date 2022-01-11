@@ -373,3 +373,57 @@ TEST (DictionaryTermId, TestSnippet) {
     }
 }
 
+TEST (DictionaryTermId, TestSnippetFilterByDictionary) {
+    DLP::Dictionaries ds;
+    DLP::DictionaryItemFactory dif;
+    int16_t score1 = 1;
+    int16_t score3 = 3;
+    {
+        DLP::Dictionary* d = new DLP::Dictionary("A",1,1);
+        d->Add(dif.CreateLiteral("aaa", &score3, nullptr, nullptr, nullptr));
+        ds.Add(d);
+    }
+    {
+        dif.ResetId();
+        DLP::Dictionary* d = new DLP::Dictionary("B",2,1);
+        d->Add(dif.CreateLiteral("bbb1", &score1, nullptr, nullptr, nullptr));
+        d->Add(dif.CreateLiteral("bbb2", &score3, nullptr, nullptr, nullptr));
+        ds.Add(d);
+    } 
+
+    std::string s("the aaa the bbb1 and bbb2");
+    DLP::DictionaryScanMatches dsm(&ds);
+    dsm.SetInputBuffer(s.c_str(), s.size());
+    // RecordMatch(dictionaryId, itemId, from, to);
+    dsm.RecordMatch(1, 1, 4, 7);
+    dsm.RecordMatch(2, 2, 12, 16);
+    dsm.RecordMatch(2, 2, 21, 25);
+
+    { 
+    std::set<uint16_t> dictionaryIds({1,2});
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets(dictionaryIds, false /* all */, 5 /* count */, 0 /* affix */, snippets);
+    EXPECT_EQ("bbb1", snippets[0]);
+    EXPECT_EQ("bbb2", snippets[1]);
+    EXPECT_EQ("aaa", snippets[2]);
+    }
+    { 
+    std::set<uint16_t> dictionaryIds({1});
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets(dictionaryIds, false /* all */, 5 /* count */, 0 /* affix */, snippets);
+    EXPECT_EQ("aaa", snippets[0]);
+    }
+    { 
+    std::set<uint16_t> dictionaryIds({2});
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets(dictionaryIds, false /* all */, 5 /* count */, 0 /* affix */, snippets);
+    EXPECT_EQ("bbb1", snippets[0]);
+    EXPECT_EQ("bbb2", snippets[1]);
+    }
+    { 
+    std::set<uint16_t> dictionaryIds({3});
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets(dictionaryIds, false /* all */, 5 /* count */, 0 /* affix */, snippets);
+    ASSERT_EQ(0, snippets.size());
+    }
+}

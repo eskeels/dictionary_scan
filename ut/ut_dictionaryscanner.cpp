@@ -77,11 +77,23 @@ TEST (DictionaryTwoLiteralDictionariesDuplicate, AllDefault) {
     AddDictionary( ds, "animals", 1 , { "duck","frog","goat" }, LITERAL );
     AddDictionary( ds, "also animals", 2 , { "duck","badger","goat" }, LITERAL );
 
+    DLP::DictionaryScanMatches dsm(&ds);
+    std::string input("goat the duck");
     EXPECT_EQ(true, ScanAndVerify2(ds,
-                                  "goat the duck",
+                                   input,
                                   {{0,4,1},   // goat - animals
                                    {0,4,2},   // goat - also animals
                                    {9,13,1},  // duck - animals 
                                    {9,13,2}}  // duck - also animals
-                                   ));
+                                   ,&dsm));
+
+    std::set<uint16_t> dictionaryIds;
+    std::vector<std::string> snippets;
+
+    dsm.CreateMatchSnippets(dictionaryIds, true, 5 /* count */, 0 /* affix */, snippets);
+    ASSERT_EQ(4UL, snippets.size());
+    EXPECT_EQ("goat", snippets[0]);
+    EXPECT_EQ("duck", snippets[1]);
+    EXPECT_EQ("goat", snippets[2]);
+    EXPECT_EQ("duck", snippets[3]);
 }

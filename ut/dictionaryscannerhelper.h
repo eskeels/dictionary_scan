@@ -100,8 +100,8 @@ DLP::DictionaryScanMatches Scan(DLP::Dictionaries& ds, const std::string& txt) {
     return dsm;
 }
 
-bool ScanAndVerify3(DLP::Dictionaries& ds, const std::string& txt, std::vector<VMatch> matches, int64_t& totalScore);
-bool ScanAndVerify3(DLP::Dictionaries& ds, const std::string& txt, std::vector<VMatch> matches, int64_t& totalScore) {
+bool ScanAndVerify3(DLP::Dictionaries& ds, const std::string& txt, std::vector<VMatch> matches, int64_t& totalScore, DLP::DictionaryScanMatches* pDSM = nullptr);
+bool ScanAndVerify3(DLP::Dictionaries& ds, const std::string& txt, std::vector<VMatch> matches, int64_t& totalScore, DLP::DictionaryScanMatches* pDSM) {
     DLP::DictionaryScanMatches dsm = Scan(ds, txt);
 
     if (dsm.GetMatchCount() != matches.size()){
@@ -158,12 +158,17 @@ bool ScanAndVerify3(DLP::Dictionaries& ds, const std::string& txt, std::vector<V
         m = dsm.GetNextMatch(idx);
         matchIdx++;
     }
+
+    if (pDSM) {
+        *pDSM = dsm;
+    }
+
     return true;
 }
 
-bool ScanAndVerify2(DLP::Dictionaries& ds, const std::string& txt, std::vector<VMatch> matches);
-bool ScanAndVerify2(DLP::Dictionaries& ds, const std::string& txt, std::vector<VMatch> matches) { 
+bool ScanAndVerify2(DLP::Dictionaries& ds, const std::string& txt, std::vector<VMatch> matches, DLP::DictionaryScanMatches* pDSM = nullptr);
+bool ScanAndVerify2(DLP::Dictionaries& ds, const std::string& txt, std::vector<VMatch> matches, DLP::DictionaryScanMatches* pDSM) { 
     int64_t totalScore = 0;
-    return ScanAndVerify3(ds, txt, matches, totalScore);
+    return ScanAndVerify3(ds, txt, matches, totalScore, pDSM);
 }
 

@@ -84,7 +84,7 @@ std::string DictionaryScanMatches::GetSnippet(const Match& match, size_t affix) 
     return s;
 }
 
-void DictionaryScanMatches::CreateMatchSnippets(std::set<uint16_t> dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string>& snippets) {
+void DictionaryScanMatches::CreateMatchSnippets(const std::set<uint16_t>& dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string>& snippets) {
     std::cout << "CreateMatchSnippets" << count << affix << std::endl;
     auto d = dictionariesMatchIndx_.begin();
     while (d != dictionariesMatchIndx_.end()) {
