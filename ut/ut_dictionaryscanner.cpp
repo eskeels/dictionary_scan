@@ -16,7 +16,7 @@ using namespace DLP;
 TEST (DictionaryEmpty, AllDefault) {
     DLP::Dictionaries ds;
 
-    DLP::DictionaryScanMatches dsm = Scan(ds, "shouldnt get any triggers");
+    DLP::DictionaryScanMatches dsm = Scan(ds, "shouldnt get any triggers", 1);
     EXPECT_EQ(size_t(0), dsm.GetMatchCount());
     EXPECT_EQ(int64_t(0), dsm.GetTotalScore());
 }

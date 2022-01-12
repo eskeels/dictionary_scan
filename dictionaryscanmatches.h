@@ -13,19 +13,21 @@ class IScanMatches {
 
 class Match {
     public:
-        Match(const IDictionaryItem* dictionaryItem, unsigned long long from, unsigned long long to)
+        Match(const IDictionaryItem* dictionaryItem, unsigned long long from, unsigned long long to, uint8_t context)
             : dictionaryItem_(dictionaryItem),
               from_(from),
               gotFrom_(true),
-              to_(to)
+              to_(to),
+              context_(context)
         {
         }
 
-        Match(const IDictionaryItem* dictionaryItem, unsigned long long to)
+        Match(const IDictionaryItem* dictionaryItem, unsigned long long to, uint8_t context)
             : dictionaryItem_(dictionaryItem),
               from_(0),
               gotFrom_(false),
-              to_(to)
+              to_(to),
+              context_(context)
         {
         }
 
@@ -53,11 +55,16 @@ class Match {
             return dictionaryItem_->IsDistinct();
         }
 
+        uint8_t GetContext() const {
+            return context_;
+        }
+
     protected:
         const IDictionaryItem* dictionaryItem_;
         unsigned long long from_;
         bool gotFrom_ = false;
         unsigned long long to_;
+        uint8_t context_;
 };
 
 class DictionaryScanMatches : public IScanMatches {
@@ -66,6 +73,7 @@ class DictionaryScanMatches : public IScanMatches {
         ~DictionaryScanMatches();
 
         void SetInputBuffer(const char* input, size_t len);
+        void SetContext(uint8_t context);
         void RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long from, unsigned long long to);
         void RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long to);
 
@@ -125,7 +133,7 @@ class DictionaryScanMatches : public IScanMatches {
 
         int64_t GetScore(uint16_t dictionaryId) const; 
 
-        void CreateMatchSnippets(const std::set<uint16_t>& dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string>& snippets);
+        void CreateMatchSnippets(const std::set<uint16_t>& dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string>& snippets, uint8_t* pcontext = nullptr);
     protected:
         void RecordMatch(Match&& match, uint16_t dictionaryId);
         void RecordScore(const Match& match, uint16_t dictionaryId);
@@ -133,8 +141,8 @@ class DictionaryScanMatches : public IScanMatches {
         std::string GetSnippet(const Match& match, size_t affix);
 
         const Dictionaries* dictionaries_;
-        const char* input_;
-        size_t len_;
+        const char* input_ = nullptr;
+        size_t len_ = 0;
         std::vector<Match> matches_;
         // dictionary id to offset in matches_ index. So we can
         // find all matches for a dictionary
@@ -142,11 +150,13 @@ class DictionaryScanMatches : public IScanMatches {
         // dictionary ids that have matched
         std::set<uint16_t> matchedDictionaryIds_;
         // total score for the scan
-        int64_t score_;
+        int64_t score_ = 0;
         // dictionary id to score
         std::unordered_map<uint16_t,int64_t> dictionaryScores_; 
         // set of all distinct matches. Used to record distinct triggers. 
         // dictionary id <--> term id
         std::set<std::pair<uint16_t,uint16_t>> distinctMatches_;
+        // context id
+        uint8_t context_;
 };
 }

@@ -17,6 +17,10 @@ void DictionaryScanMatches::SetInputBuffer(const char* input, size_t len) {
     len_ = len;
 }
 
+void DictionaryScanMatches::SetContext(uint8_t context) {
+    context_ = context;
+}
+
 int64_t DictionaryScanMatches::GetScore(uint16_t dictionaryId) const {
     auto it = dictionaryScores_.find(dictionaryId);
     if (it != dictionaryScores_.end()) {
@@ -84,7 +88,7 @@ std::string DictionaryScanMatches::GetSnippet(const Match& match, size_t affix) 
     return s;
 }
 
-void DictionaryScanMatches::CreateMatchSnippets(const std::set<uint16_t>& dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string>& snippets) {
+void DictionaryScanMatches::CreateMatchSnippets(const std::set<uint16_t>& dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string>& snippets, uint8_t* pcontext) {
     std::cout << "CreateMatchSnippets" << count << affix << std::endl;
     auto d = dictionariesMatchIndx_.begin();
     while (d != dictionariesMatchIndx_.end()) {
@@ -94,12 +98,14 @@ void DictionaryScanMatches::CreateMatchSnippets(const std::set<uint16_t>& dictio
             std::cout << "Dictionary id is " << did << std::endl;
             for (size_t i=0; (i <= count) && (i < matches.size()) && (snippets.size() <= count) ; ++i) {
                 auto& match = matches_[matches[i]];
-                std::string s = GetSnippet(match, affix);
-                if (!s.empty()) {
-                    std::cout << "Snip is [" << s << "]" << std::endl;
-                    snippets.push_back(std::move(s));
+                if (pcontext == nullptr || (pcontext != nullptr && match.GetContext() == *pcontext)) {
+                    std::string s = GetSnippet(match, affix);
+                    if (!s.empty()) {
+                        std::cout << "Snip is [" << s << "]" << std::endl;
+                        snippets.push_back(std::move(s));
+                    }
+                    std::cout << match.GetFrom() << " " <<  match.GetTo() << std::endl;
                 }
-                std::cout << match.GetFrom() << " " <<  match.GetTo() << std::endl;
             }
         }
         d++;
@@ -132,7 +138,7 @@ void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, 
 
     const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
     if (dictionaryItem) {
-        RecordMatch(Match(dictionaryItem, from, to),dictionaryId);
+        RecordMatch(Match(dictionaryItem, from, to, context_),dictionaryId);
     } else {
         // TODO: Trying to add a match with no corresponding entry in dictionary
         // raise error / warning
@@ -144,7 +150,7 @@ void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, 
 
     const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
     if (dictionaryItem) {
-        RecordMatch(Match(dictionaryItem, to), dictionaryId);
+        RecordMatch(Match(dictionaryItem, to, context_), dictionaryId);
     } else {
         // TODO: Trying to add a match with no corresponding entry in dictionary
         // raise error / warning
