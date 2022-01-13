@@ -96,7 +96,7 @@ DLP::DictionaryScanMatches Scan(DLP::Dictionaries& ds, const std::string& txt, u
     dscanner.Initialize({});
     std::unique_ptr<IScanState> ss(dscanner.CreateScanState());
     DLP::DictionaryScanMatches dsm(&ds);
-    dscanner.Scan(&dsm, &*ss, 0, txt.c_str(), txt.size(), txt.c_str(), txt.size(), context);
+    dscanner.Scan(&dsm, &*ss, 0, 0, txt.c_str(), txt.size(), txt.c_str(), txt.size(), context);
     return dsm;
 }
 

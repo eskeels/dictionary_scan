@@ -74,6 +74,8 @@ class DictionaryScanMatches : public IScanMatches {
 
         void SetInputBuffer(const char* input, size_t len);
         void SetContext(uint8_t context);
+        void SetOffset(size_t offset);
+        void SetOverlap(size_t overlap);
         void RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long from, unsigned long long to);
         void RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long to);
 
@@ -138,6 +140,8 @@ class DictionaryScanMatches : public IScanMatches {
         void RecordMatch(Match&& match, uint16_t dictionaryId);
         void RecordScore(const Match& match, uint16_t dictionaryId);
         bool CheckDistinct(const Match& match, uint16_t dictionaryId);
+        bool CheckOverlap(const Match& match, uint16_t dictionaryId);
+
         std::string GetSnippet(const Match& match, size_t affix);
 
         const Dictionaries* dictionaries_;
@@ -157,6 +161,11 @@ class DictionaryScanMatches : public IScanMatches {
         // dictionary id <--> term id
         std::set<std::pair<uint16_t,uint16_t>> distinctMatches_;
         // context id
-        uint8_t context_;
+        uint8_t context_ = 0;
+        // overlap when scanning in chunks
+        size_t overlap_ = 0;
+        // offset when scanning in chunks
+        size_t offset_ = 0;
+        std::set<std::tuple<size_t,uint16_t,uint16_t>> matchesInOverlap_;
 };
 }

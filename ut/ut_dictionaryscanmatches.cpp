@@ -488,3 +488,43 @@ TEST (DictionaryTermId, TestSnippetFilterByContext) {
     EXPECT_EQ(0, snippets.size());
     }
 }
+
+TEST (DictionaryTermId, TestOverlap) {
+    DLP::Dictionaries ds;
+    DLP::DictionaryItemFactory dif;
+    int16_t score1 = 1;
+    int16_t score3 = 3;
+    {
+        DLP::Dictionary* d = new DLP::Dictionary("A",1,1);
+        d->Add(dif.CreateLiteral("aaa", &score3, nullptr, nullptr, nullptr));
+        ds.Add(d);
+    }
+
+    DLP::DictionaryScanMatches dsm(&ds);
+    // RecordMatch(dictionaryId, itemId, from, to);
+    std::string inputBuf(50, ' ');
+    dsm.SetInputBuffer(inputBuf.c_str(), inputBuf.size());
+    dsm.SetOffset(0);
+    dsm.SetOverlap(10);
+    // Record at match at position 45 
+    dsm.RecordMatch(1, 1, 45, 46);
+    EXPECT_EQ(3, dsm.GetTotalScore());
+
+    // now move to next chunk
+    dsm.SetOffset(39);
+    // duplicate of above so should get ignored
+    dsm.RecordMatch(1, 1, 6, 7);
+    EXPECT_EQ(3, dsm.GetTotalScore());
+    // duplicate of above so should get ignored
+    dsm.RecordMatch(1, 1, 6, 7);
+    EXPECT_EQ(3, dsm.GetTotalScore());
+    // new match
+    dsm.RecordMatch(1, 1, 8, 9);
+    EXPECT_EQ(6, dsm.GetTotalScore());
+    // dupe ignored
+    dsm.RecordMatch(1, 1, 8, 9);
+    EXPECT_EQ(6, dsm.GetTotalScore());
+
+}
+
+

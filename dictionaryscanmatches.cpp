@@ -5,8 +5,7 @@
 namespace DLP {
 
 DictionaryScanMatches::DictionaryScanMatches(const Dictionaries* dictionaries)
-    : dictionaries_(dictionaries),
-      score_(0){
+    : dictionaries_(dictionaries) {
 }
 
 DictionaryScanMatches::~DictionaryScanMatches() {
@@ -19,6 +18,14 @@ void DictionaryScanMatches::SetInputBuffer(const char* input, size_t len) {
 
 void DictionaryScanMatches::SetContext(uint8_t context) {
     context_ = context;
+}
+
+void DictionaryScanMatches::SetOffset(size_t offset) {
+    offset_ = offset;
+}
+
+void DictionaryScanMatches::SetOverlap(size_t overlap) {
+    overlap_ = overlap;
 }
 
 int64_t DictionaryScanMatches::GetScore(uint16_t dictionaryId) const {
@@ -112,15 +119,32 @@ void DictionaryScanMatches::CreateMatchSnippets(const std::set<uint16_t>& dictio
     }
 }
 
+bool DictionaryScanMatches::CheckOverlap(const Match& match, uint16_t dictionaryId) {
+    if (match.GetTo() < overlap_ || match.GetTo() > (len_ - overlap_)) {
+        size_t absPos = match.GetTo() + offset_;
+        auto it = matchesInOverlap_.find(std::make_tuple(absPos, dictionaryId, match.GetItemId()));
+        if (it != matchesInOverlap_.end()) {
+            // dupe trigger so ignore
+            return true;
+        }
+        matchesInOverlap_.insert(std::make_tuple(absPos, dictionaryId, match.GetItemId()));
+    }
+    return false;
+}
+
 void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
     if (CheckDistinct(match, dictionaryId)) {
         // match was distinct and we already have a hit
         return;
     }
 
+    if (overlap_ > 0 && CheckOverlap(match, dictionaryId)) {
+        // match was in an overlap and was a duplicate
+        return;
+    }
+
     RecordScore(match, dictionaryId);
     matchedDictionaryIds_.insert(dictionaryId);
-
     matches_.push_back(match);
     uint32_t idx = (uint32_t)matches_.size()-1;
     
