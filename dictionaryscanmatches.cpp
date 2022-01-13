@@ -28,6 +28,10 @@ void DictionaryScanMatches::SetOverlap(size_t overlap) {
     overlap_ = overlap;
 }
 
+void DictionaryScanMatches::SetMatchLimit(size_t matchLimit) {
+    matchLimit_ = matchLimit;
+}
+
 int64_t DictionaryScanMatches::GetScore(uint16_t dictionaryId) const {
     auto it = dictionaryScores_.find(dictionaryId);
     if (it != dictionaryScores_.end()) {
@@ -145,6 +149,11 @@ void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
 
     RecordScore(match, dictionaryId);
     matchedDictionaryIds_.insert(dictionaryId);
+
+    // check match limit
+    if (matches_.size() >= matchLimit_) {
+        return;
+    }
     matches_.push_back(match);
     uint32_t idx = (uint32_t)matches_.size()-1;
     

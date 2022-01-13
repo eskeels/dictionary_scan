@@ -76,6 +76,7 @@ class DictionaryScanMatches : public IScanMatches {
         void SetContext(uint8_t context);
         void SetOffset(size_t offset);
         void SetOverlap(size_t overlap);
+        void SetMatchLimit(size_t matchLimit);
         void RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long from, unsigned long long to);
         void RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long to);
 
@@ -166,6 +167,9 @@ class DictionaryScanMatches : public IScanMatches {
         size_t overlap_ = 0;
         // offset when scanning in chunks
         size_t offset_ = 0;
+        // set of absolute offset / dictionary id / term id
         std::set<std::tuple<size_t,uint16_t,uint16_t>> matchesInOverlap_;
+        // limit on number of matches
+        size_t matchLimit_ = 100000;
 };
 }

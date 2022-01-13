@@ -57,13 +57,14 @@ static int literalEvent(unsigned int id, unsigned long long from,
     return 0;
 }
 
-void DictionaryScanner::Scan(IScanMatches* sm, IScanState* ss, size_t offset, size_t overlap, const char * input, size_t ilen, const char * normalized, size_t nlen, uint8_t context) const {
+void DictionaryScanner::Scan(IScanMatches* sm, IScanState* ss, size_t offset, size_t overlap, const char * input, size_t ilen, const char * normalized, size_t nlen, uint8_t context, size_t matchLimit) const {
     // scan with regex engines 
     DictionaryScanMatches* dsm = static_cast<DictionaryScanMatches*>(sm);
     dsm->SetInputBuffer(input, ilen);
     dsm->SetContext(context);
     dsm->SetOffset(offset);
     dsm->SetOverlap(overlap);
+    dsm->SetMatchLimit(matchLimit);
     DictionaryScanState* dss = static_cast<DictionaryScanState*>(ss);
     HSRegexScanState* rss = static_cast<HSRegexScanState*>(dss->GetRegexScanState());
     HSRegexScanState* lss = static_cast<HSRegexScanState*>(dss->GetLitScanState());

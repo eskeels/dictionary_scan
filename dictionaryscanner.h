@@ -24,7 +24,7 @@ class DictionaryScanner : public IScanner {
 
         IScanState* CreateScanState() const;
 
-        void Scan(IScanMatches* sm, IScanState* ss, size_t offset, size_t overlap, const char * input, size_t ilen, const char * normalized, size_t nlen, uint8_t context) const;
+        void Scan(IScanMatches* sm, IScanState* ss, size_t offset, size_t overlap, const char * input, size_t ilen, const char * normalized, size_t nlen, uint8_t context, size_t matchLimit = 100000) const;
 
     protected:
         const Dictionaries* dictionaries_;
