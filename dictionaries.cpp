@@ -1,20 +1,17 @@
 #include <iostream>
-
+#include <memory>
 #include "dictionaries.h"
 
 namespace DLP {
 
 Dictionaries::~Dictionaries() {
-    for (auto d : dictionaries_) {
-        delete d;
-    }
 }
 
-void Dictionaries::Add(const Dictionary* d) {
+void Dictionaries::Add(Dictionary* d) {
     std::string name = d->GetName();
     uint16_t id = d->GetId();
 
-    dictionaries_.push_back(d);
+    dictionaries_.push_back(std::move(std::unique_ptr<const Dictionary>(d)));
 
     uint16_t pos = static_cast<uint16_t>(dictionaries_.size()) - 1;
     dictionariesIndx_.insert(std::make_pair(id, pos));
@@ -29,7 +26,7 @@ const Dictionary* Dictionaries::GetDictionary(const std::string& name) const {
         return nullptr;
     }
 
-    return dictionaries_[pos->second];
+    return dictionaries_[pos->second].get();
 }
 
 const Dictionary* Dictionaries::GetDictionary(uint16_t id) const {
@@ -39,7 +36,7 @@ const Dictionary* Dictionaries::GetDictionary(uint16_t id) const {
         return nullptr;
     }
 
-    return dictionaries_[pos->second];
+    return dictionaries_[pos->second].get();
 }
 
 const IDictionaryItem* Dictionaries::GetDictionaryItem(uint16_t dictionaryId, uint16_t itemId) const {
@@ -56,7 +53,7 @@ const Dictionary* Dictionaries::GetNextDictionary(size_t& idx) const {
         return nullptr;
     }
 
-    const Dictionary* ret = dictionaries_[idx];
+    const Dictionary* ret = dictionaries_[idx].get();
     ++idx;
     return ret;
 }
