@@ -34,6 +34,7 @@ class DictionaryItem : public IDictionaryItem {
         bool IsDistinct() const { return distinct_; }
         bool IsCaseSensitive() const { return caseSensitive_; }
         bool IsLiteral() const { return false; }
+        bool IsPartial() const { return partial_; }
     protected:
         int16_t score_;
         bool distinct_;

@@ -97,3 +97,55 @@ TEST (DictionaryTwoLiteralDictionariesDuplicate, AllDefault) {
     EXPECT_EQ("goat", snippets[2]);
     EXPECT_EQ("duck", snippets[3]);
 }
+
+TEST (DictionaryOneItemFull, Full) {
+    DLP::Dictionaries ds;
+    // partial is false so only whole word will match
+    AddDictionary( ds, "words", 1 , { "sat" }, LITERAL, 20, false, false, true );
+
+    {
+    const std::string txt = "satthe cat sat on the matsat";
+    DLP::DictionaryScanMatches dsm = Scan(ds, txt, 1);
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets({}, true, 10, 3, snippets, nullptr);
+    ASSERT_EQ(1UL, snippets.size());
+    EXPECT_EQ("at sat on", snippets[0]);
+    }
+    {
+    const std::string txt = "sat the cat saton the matsat";
+    DLP::DictionaryScanMatches dsm = Scan(ds, txt, 1);
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets({}, true, 10, 3, snippets, nullptr);
+    ASSERT_EQ(1UL, snippets.size());
+    EXPECT_EQ("sat th", snippets[0]);
+    }
+    {
+    const std::string txt = "the cat saton the sat";
+    DLP::DictionaryScanMatches dsm = Scan(ds, txt, 1);
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets({}, true, 10, 3, snippets, nullptr);
+    ASSERT_EQ(1UL, snippets.size());
+    EXPECT_EQ("he sat", snippets[0]);
+    }
+}
+
+TEST (DictionaryOneItemDistinct, Distinct) {
+    DLP::Dictionaries ds;
+    // distinct is true so only one match should count
+    AddDictionary( ds, "words", 1 , { "sat" }, LITERAL, 20, false, true, true );
+
+    {
+    const std::string txt = "the cat sat on the mat sat";
+    DLP::DictionaryScanMatches dsm = Scan(ds, txt, 1);
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets({}, true, 10, 3, snippets, nullptr);
+    ASSERT_EQ(1UL, snippets.size());
+    EXPECT_EQ("at sat on", snippets[0]);
+    }
+}
+
+/*
+bool caseSens = true );
+*/
+
+

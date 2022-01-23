@@ -5,12 +5,10 @@
 namespace DLP {
 
 Dictionary::~Dictionary() {
-    for( auto di : items_ ){
-        delete di;
-    }
 }
+
 void Dictionary::Add(const IDictionaryItem* item) {
-    items_.push_back(item);
+    items_.push_back(std::move(std::unique_ptr<const IDictionaryItem>(item)));
     uint16_t pos = static_cast<uint16_t>(items_.size()) - 1;
     itemsIndx_.insert(std::make_pair(item->GetId(), pos));
 }
@@ -22,7 +20,7 @@ const IDictionaryItem* Dictionary::GetDictionaryItem(uint16_t id) const {
         return nullptr;
     }
 
-    return items_[pos->second];
+    return items_[pos->second].get();
 }
 
 const IDictionaryItem* Dictionary::GetNextDictionaryItem(size_t& idx) const {
@@ -30,7 +28,7 @@ const IDictionaryItem* Dictionary::GetNextDictionaryItem(size_t& idx) const {
         return nullptr;
     }
 
-    const IDictionaryItem* ret = items_[idx];
+    const IDictionaryItem* ret = items_[idx].get();
     ++idx;
     return ret;
 }

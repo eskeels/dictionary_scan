@@ -46,7 +46,7 @@ bool DictionaryScanMatches::CheckDistinct(const Match& match, uint16_t dictionar
         auto it = distinctMatches_.find(std::make_pair(dictionaryId,match.GetItemId()));
         if (it == distinctMatches_.end()) {
             // insert
-            distinctMatches_.insert(std::make_pair(dictionaryId,match.GetScore()));
+            distinctMatches_.insert(std::make_pair(dictionaryId,match.GetItemId()));
             // distinct but first hit
             return false;
          } else {
@@ -85,12 +85,14 @@ std::string DictionaryScanMatches::GetSnippet(const Match& match, size_t affix) 
     
     if (prefix < startPos) {
         startPos -= prefix;
+        // TODO: If this is midway through a utf-8 sequence
     } else {
         startPos = 0;
     }
 
     if (endPos+suffix <= len_) {
         endPos += suffix;
+        // TODO: If this is midway through a utf-8 sequence
     } else {
         endPos = len_;
     }
@@ -136,6 +138,44 @@ bool DictionaryScanMatches::CheckOverlap(const Match& match, uint16_t dictionary
     return false;
 }
 
+bool DictionaryScanMatches::CheckPartial(const Match& match) {
+    if (match.IsPartial()) {
+        // partials can match anywhere
+        return false;
+    }
+    size_t to = match.GetTo();
+    if (to < len_ && input_) {
+        // TODO: make correct for utf-8 
+        char after = *(input_ + to);
+        // TODO: support all whitespace including unicode
+        if (after != ' ') {
+            return true;
+        }
+    }
+
+    if (!match.HasFrom()) {
+        // no start position so we can not
+        // determine partial status. Return
+        // false so match is recorded regardless.
+        return false;
+    }
+    size_t from = match.GetFrom();
+    if (from > 0 && input_) {
+        // TODO: make correct for utf-8
+        --from;
+        char before = *(input_ + from);
+        // TODO: support all whitespace including unicode
+        if (before != ' ') {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        // match at start of stream
+        return false;
+    }
+}
+
 void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
     if (CheckDistinct(match, dictionaryId)) {
         // match was distinct and we already have a hit
@@ -144,6 +184,12 @@ void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
 
     if (overlap_ > 0 && CheckOverlap(match, dictionaryId)) {
         // match was in an overlap and was a duplicate
+        return;
+    }
+
+    if (CheckPartial(match)) {
+        // match was non partial and had non whitespace
+        // characters before / after the start / end
         return;
     }
 

@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 
+#include <memory>
 #include <vector>
 #include <unordered_map>
 
@@ -29,7 +30,7 @@ class Dictionary {
         const IDictionaryItem* GetNextDictionaryItem(size_t& idx) const;
     protected:
         // all the items in this dictionary
-        std::vector<const IDictionaryItem*> items_;
+        std::vector<std::unique_ptr<const IDictionaryItem>> items_;
         // item id to offset in above vector
         std::unordered_map<uint16_t,uint16_t> itemsIndx_;
         // name of dictionary

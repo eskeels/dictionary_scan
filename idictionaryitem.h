@@ -15,6 +15,7 @@ class IDictionaryItem {
         virtual bool IsDistinct() const = 0; 
         virtual bool IsCaseSensitive() const = 0;
         virtual bool IsLiteral() const = 0;
+        virtual bool IsPartial() const = 0;
         virtual ~IDictionaryItem() {};
 };
 }

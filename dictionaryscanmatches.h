@@ -59,6 +59,10 @@ class Match {
             return context_;
         }
 
+        bool IsPartial() const {
+            return dictionaryItem_->IsPartial();
+        }
+
     protected:
         const IDictionaryItem* dictionaryItem_;
         unsigned long long from_;
@@ -142,6 +146,7 @@ class DictionaryScanMatches : public IScanMatches {
         void RecordScore(const Match& match, uint16_t dictionaryId);
         bool CheckDistinct(const Match& match, uint16_t dictionaryId);
         bool CheckOverlap(const Match& match, uint16_t dictionaryId);
+        bool CheckPartial(const Match& match);
 
         std::string GetSnippet(const Match& match, size_t affix);
 
