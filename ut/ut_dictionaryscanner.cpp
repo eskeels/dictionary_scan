@@ -135,7 +135,7 @@ TEST (DictionaryOneItemDistinct, Distinct) {
     AddDictionary( ds, "words", 1 , { "sat" }, LITERAL, 20, false, true, true );
 
     {
-    const std::string txt = "the cat sat on the mat sat";
+    const std::string txt = "the cat sat on the mat SaT sat";
     DLP::DictionaryScanMatches dsm = Scan(ds, txt, 1);
     std::vector<std::string> snippets;
     dsm.CreateMatchSnippets({}, true, 10, 3, snippets, nullptr);
@@ -144,8 +144,52 @@ TEST (DictionaryOneItemDistinct, Distinct) {
     }
 }
 
-/*
-bool caseSens = true );
-*/
+TEST (DictionaryOneItemCaseInsensitive, CaseInsensitive) {
+    DLP::Dictionaries ds;
+    AddDictionary( ds, "words", 1 , { "SAT" }, LITERAL, 20, false, false, false );
+
+    {
+    const std::string txt = "the cat SAT on the mat saT";
+    DLP::DictionaryScanMatches dsm = Scan(ds, txt, 1);
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets({}, true, 10, 3, snippets, nullptr);
+    ASSERT_EQ(2UL, snippets.size());
+    EXPECT_EQ("at SAT on", snippets[0]);
+    EXPECT_EQ("at saT", snippets[1]);
+    }
+}
+
+TEST (DictionaryOneItemCaseInsensitiveDistinct, CaseInsensitiveDistinct) {
+    DLP::Dictionaries ds;
+    AddDictionary( ds, "words", 1 , { "SAT" }, LITERAL, 20, false, true, false );
+
+    {
+    const std::string txt = "the cat SAT on the mat saT";
+    DLP::DictionaryScanMatches dsm = Scan(ds, txt, 1);
+    std::vector<std::string> snippets;
+    dsm.CreateMatchSnippets({}, true, 10, 3, snippets, nullptr);
+    ASSERT_EQ(1UL, snippets.size());
+    EXPECT_EQ("at SAT on", snippets[0]);
+    }
+}
+
+TEST (DictionaryOneItemNegativeTotalScore, AllDefault) {
+    DLP::Dictionaries ds;
+    AddDictionary( ds, "words", 1 , { "sat" }, LITERAL, -10 );
+
+    int64_t totalScore = 0;
+    EXPECT_EQ(true, ScanAndVerify3(ds, "the cat sat on the mat", {{8,11,1}}, totalScore));
+    EXPECT_EQ(-10, totalScore);
+}
+
+TEST (DictionaryOneItemZeroTotalScore, AllDefault) {
+    DLP::Dictionaries ds;
+    AddDictionary( ds, "words1", 1 , { "sat" }, LITERAL, -10 );
+    AddDictionary( ds, "words2", 2 , { "the" }, LITERAL, 10 );
+
+    int64_t totalScore = 0;
+    EXPECT_EQ(false, ScanAndVerify3(ds, "the cat sat on the mat", {{0,3,2},{8,11,1}}, totalScore));
+    EXPECT_EQ(0, totalScore);
+}
 
 
