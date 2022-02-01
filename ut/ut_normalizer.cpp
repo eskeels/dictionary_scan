@@ -16,10 +16,10 @@ TEST (NormalizerTest, ascii) {
 TEST (NormalizerTest, math) {
     std::string s = "𝐀𝐁𝐃";
     size_t newLen;
-    char * result = normalize(&s[0], s.size(), true, true, true, newLen);
+    char * result = normalize(&s[0], s.size(), true, false, true, newLen);
     std::string sresult(result);
     free(result);
-    EXPECT_EQ(sresult, "abd");
+    EXPECT_EQ(sresult, "ABD");
 }
 
 TEST (NormalizerTest, japaneseFullWidth) {
@@ -31,6 +31,20 @@ TEST (NormalizerTest, japaneseFullWidth) {
     EXPECT_EQ(sresult, "!#$");
 }
 
-// Test strip accents  á
-// lower case
+TEST (NormalizerTest, stripAccents) {
+    std::string s = "àáăǎ";
+    size_t newLen;
+    char * result = normalize(&s[0], s.size(), true, true, true, newLen);
+    std::string sresult(result);
+    free(result);
+    EXPECT_EQ(sresult, "aaaa");
+}
 
+TEST (NormalizerTest, lowerCase) {
+    std::string s = "UPPERCASE";
+    size_t newLen;
+    char * result = normalize(&s[0], s.size(), true, true, true, newLen);
+    std::string sresult(result);
+    free(result);
+    EXPECT_EQ(sresult, "uppercase");
+}
