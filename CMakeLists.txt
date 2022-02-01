@@ -53,3 +53,9 @@ target_link_libraries(ut_normalizer ${TEST_LIBS} utf8proc)
 add_dependencies(ut_normalizer dictionary_scanner)
 add_test(NAME ut_normalizer COMMAND ut_normalizer)
 
+add_executable(dictionaryscanner tools/main.cpp)
+target_link_libraries(dictionaryscanner ${TEST_LIBS} hs)
+add_dependencies(dictionaryscanner dictionary_scanner)
+add_test(NAME dictionaryscanner COMMAND dictionaryscanner)
+
+
