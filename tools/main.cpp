@@ -6,6 +6,7 @@
 #include "dictionaryitemfactory.h"
 #include "json11.hpp"
 #include "dictionaryparser.h"
+#include "dictionaryscanner.h"
 
 
 bool processArgs(int argc, char* argv[], std::string& dictionary, std::string& fileToScan) {
@@ -35,18 +36,25 @@ bool processArgs(int argc, char* argv[], std::string& dictionary, std::string& f
     return true;
 }
 
-int main(int argc, char *argv[]) {
+void ReadFileToScan(const std::string& fileName, std::string& txt) {
+    std::ifstream myfile (fileName);
 
-    std::string dictionary;
-    std::string fileToScan;
-
-    if (false==processArgs(argc, argv, dictionary, fileToScan)) {
-        return 0;
+    if (myfile.is_open()) {
+        std::string line;
+        while ( std::getline(myfile,line) ) {
+            txt.append(line);
+            txt.append("\n");
+        }
+        myfile.close();
     }
-
-    std::cout << "Scanning " << fileToScan << " with dictionary " << dictionary << std::endl;
-
-    std::ifstream myfile (dictionary);
+    else {
+        std::cout << "Unable to open file";
+        return;
+    }
+}
+ 
+void ReadDictionaries(const std::string& fileName, DLP::Dictionaries& dictionaries) {
+    std::ifstream myfile (fileName);
     std::string dictionaryJson;
 
     if (myfile.is_open()) {
@@ -59,12 +67,45 @@ int main(int argc, char *argv[]) {
     }
     else {
         std::cout << "Unable to open file";
-        return 0;
+        return;
     }
 
     DLP::DictionaryJSONParser djp(dictionaryJson);
-    DLP::Dictionaries dictionaries;
+    
     djp.Parse(dictionaries);
+}
+
+int main(int argc, char *argv[]) {
+
+    std::string dictionary;
+    std::string fileToScan;
+
+    if (false==processArgs(argc, argv, dictionary, fileToScan)) {
+        return 0;
+    }
+
+    std::cout << "Scanning " << fileToScan << " with dictionary " << dictionary << std::endl;
+
+    DLP::Dictionaries dictionaries;
+
+    ReadDictionaries(dictionary, dictionaries);
+    std::string txt;
+    ReadFileToScan(fileToScan, txt);
+
+    DLP::DictionaryScanner dscanner(&dictionaries);
+    dscanner.Initialize({});
+    std::unique_ptr<DLP::IScanState> ss(dscanner.CreateScanState());
+    DLP::DictionaryScanMatches dsm(&dictionaries);
+    uint8_t context = 99;
+    dscanner.Scan(&dsm, &*ss, 0, 0, txt.c_str(), txt.size(), txt.c_str(), txt.size(), context);
+
+    std::vector<std::string> snippets;
+
+    dsm.CreateMatchSnippets({}, true, 100, 5, snippets, nullptr);
+    for( auto& s : snippets) {
+        std::cout << s << std::endl;
+    }
 
     return 0;
 }
+

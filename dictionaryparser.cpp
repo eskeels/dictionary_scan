@@ -51,7 +51,6 @@ namespace DLP {
                     IDictionaryItem* item = factory.CreateLiteral(val, nullptr, nullptr, nullptr, nullptr);
                     dictionary->Add(item);                              
                 }
-                std::cout << literal.string_value() << std::endl;
             }
         }
     }
@@ -72,25 +71,20 @@ namespace DLP {
                     if (score == 0) {
                         score = 10;
                     }
-                    IDictionaryItem* item = factory.CreateLiteral(val, &score, &distinct, &partial, &caseSensitive);
+                    IDictionaryItem* item = factory.CreateRegex(val, &score, &distinct, &partial, &caseSensitive);
                     dictionary->Add(item); 
-                    std::cout << val << std::endl;
-
                 }
             } else {
                 std::string val = regex.string_value();
                 if (!val.empty()) {
-                    IDictionaryItem* item = factory.CreateLiteral(val, nullptr, nullptr, nullptr, nullptr);
+                    IDictionaryItem* item = factory.CreateRegex(val, nullptr, nullptr, nullptr, nullptr);
                     dictionary->Add(item);                              
                 }
-                std::cout << regex.string_value() << std::endl;
             }
         }
     }
 
     void DictionaryJSONParser::ParseDictionaryAttributes(const json11::Json& jDic, std::string& name, uint16_t& dictionaryId, uint16_t& revision) {
-        std::cout << "1" << std::endl;
-        std::cout << "Name is " << jDic["name"].string_value() << std::endl;
         name = jDic["name"].string_value();
         dictionaryId = 0;
         auto jDictionaryId = jDic["id"];
@@ -125,10 +119,7 @@ namespace DLP {
                     dictionaries.Add(dictionary);
                 }
             }
-            std::cout<<t_obj.dump()<<" "<<err<<std::endl;
-            std::cout<<std::endl;
         }
-
     }
 }
 
