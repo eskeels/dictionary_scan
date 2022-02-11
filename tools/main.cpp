@@ -99,11 +99,17 @@ int main(int argc, char *argv[]) {
     uint8_t context = 99;
     dscanner.Scan(&dsm, &*ss, 0, 0, txt.c_str(), txt.size(), txt.c_str(), txt.size(), context);
 
+    std::vector<std::string> matchedDictionaries;
+    dsm.GetMatchedDictionaryNames(matchedDictionaries);
+    for (auto name : matchedDictionaries) {
+        std::cout << "Matched dictionary " << name << std::endl;
+    }
+
     std::vector<std::string> snippets;
 
-    dsm.CreateMatchSnippets({}, true, 100, 5, snippets, nullptr);
+    dsm.CreateMatchSnippets({}, true, 100, 1, snippets, nullptr);
     for( auto& s : snippets) {
-        std::cout << s << std::endl;
+        std::cout << "{" << s << "}" << std::endl;
     }
 
     return 0;

@@ -81,6 +81,14 @@ std::string DictionaryScanMatches::GetSnippet(const Match& match, size_t affix) 
         startPos = match.GetFrom();
     } else {
         startPos = match.GetTo();
+        // TODO: No from (regex) so just use 3 for now
+        if (startPos > 3) {
+            startPos -= 3;
+        } else {
+            startPos = 0;
+        }
+std::cout << "startPos is " << startPos << std::endl;
+
     }
     
     if (prefix < startPos) {
@@ -102,19 +110,16 @@ std::string DictionaryScanMatches::GetSnippet(const Match& match, size_t affix) 
 }
 
 void DictionaryScanMatches::CreateMatchSnippets(const std::set<uint16_t>& dictionaryIds, bool all, size_t count, size_t affix, std::vector<std::string>& snippets, uint8_t* pcontext) {
-    std::cout << "CreateMatchSnippets" << count << affix << std::endl;
     auto d = dictionariesMatchIndx_.begin();
     while (d != dictionariesMatchIndx_.end()) {
         uint16_t did = d->first;
         if (all || (dictionaryIds.find(did) != dictionaryIds.end())) {
             auto& matches = d->second;
-            std::cout << "Dictionary id is " << did << std::endl;
             for (size_t i=0; (i <= count) && (i < matches.size()) && (snippets.size() <= count) ; ++i) {
                 auto& match = matches_[matches[i]];
                 if (pcontext == nullptr || (pcontext != nullptr && match.GetContext() == *pcontext)) {
                     std::string s = GetSnippet(match, affix);
                     if (!s.empty()) {
-                        std::cout << "Snip is [" << s << "]" << std::endl;
                         snippets.push_back(std::move(s));
                     }
                     std::cout << match.GetFrom() << " " <<  match.GetTo() << std::endl;

@@ -134,6 +134,12 @@ class DictionaryScanMatches : public IScanMatches {
             return  matchedDictionaryIds_;
         }
 
+        void GetMatchedDictionaryNames(std::vector<std::string>& names) const {
+            for (uint16_t id : matchedDictionaryIds_) {
+                names.push_back(dictionaries_->GetDictionary(id)->GetName());
+            }
+        }
+
         int64_t GetTotalScore() const {
             return score_;
         }
