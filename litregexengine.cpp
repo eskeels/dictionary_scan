@@ -23,7 +23,6 @@ namespace DLP {
         }
     }
 
-
     void LitRegexEngine::Initialize() {
         if (expressions_.size()>0) {
             hs_compile_error_t *compile_err;
@@ -43,13 +42,17 @@ namespace DLP {
         }
     }
 
-    void LitRegexEngine::Serialize() {
-        char *bytes;
-        size_t length;
-        if (HS_SUCCESS == hs_serialize_database(database_, &bytes, &length)) {
+// TODO : put into HSBAseRegexEngine
+    bool LitRegexEngine::Serialize(char **bytes, size_t *length, std::string& errDesc) {
+//        char *bytes;
+//        size_t length;
+        if (HS_SUCCESS == hs_serialize_database(database_, bytes, length)) {
             std::cout << "Length is " << length << std::endl;
+            return true;
         } else {
+            errDesc = "Serialize fail!";
             std::cout << "FAIL!" << std::endl;
+            return false;
         }
     }
 }

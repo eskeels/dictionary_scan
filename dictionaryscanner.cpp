@@ -16,14 +16,35 @@ DictionaryScanner::DictionaryScanner(const Dictionaries* ds)
 DictionaryScanner::~DictionaryScanner() {
 }
 
-void DictionaryScanner::Initialize(const std::vector<uint16_t>& /*dictionaryIds*/) {
+std::vector<char> readFile(const std::string& filename)
+{
+    // open the file:
+    std::basic_ifstream<char> file(filename.c_str(), std::ios::binary);
+
+    // read the data:
+    return std::vector<char>((std::istreambuf_iterator<char>(file)),
+                              std::istreambuf_iterator<char>());
+}
+
+void DictionaryScanner::Initialize(const std::vector<uint16_t>& /*dictionaryIds*/, const std::string& filename) {
     regexEngine_->Register(dictionaries_);
     litRegexEngine_->Register(dictionaries_);
     if (regexEngine_->GetItemCount() > 0) {
+
         regexEngine_->Initialize();
     }
     if (litRegexEngine_->GetItemCount() > 0) {
-        litRegexEngine_->Initialize();
+// TODO: add file name
+// load byte from disk
+// pass bytes + size into Initialize()
+        
+        if (!filename.empty()) {
+            std::vector<char> dbFromFile = readFile("literal-db.bin");
+            std::string errDesc;
+            litRegexEngine_->Initialize((char *)&dbFromFile[0], (size_t)dbFromFile.size(), errDesc);    
+        } else {
+            litRegexEngine_->Initialize();
+        }
     }
 }
 
@@ -81,6 +102,30 @@ void DictionaryScanner::Scan(IScanMatches* sm, IScanState* ss, size_t offset, si
             printf("LIT ERROR FROM SCAN!!!");
         }
     }
+}
+
+void writeDBToFile(const std::string& filename, IRegexEngine* regexEngine) {
+    if (regexEngine->GetItemCount()) {
+        char *bytesDb;
+        size_t length;
+        std::ofstream outFile(filename.c_str(), std::ios::out | std::ios::binary);
+        std::cout << "Count is " << regexEngine->GetItemCount() << std::endl;
+        std::string errorDesc;
+        regexEngine->Serialize(&bytesDb, &length, errorDesc);
+        outFile.write(bytesDb, length);
+        outFile.close();
+        // TODO: free bytesDB
+    }
+}
+ 
+bool DictionaryScanner::Serialize(const std::string& fileName, std::string& errorDesc) const {
+    std::cout << fileName << std::endl;
+    errorDesc = "";
+
+    writeDBToFile("literal-db.bin", litRegexEngine_);
+    writeDBToFile("regex-db.bin", regexEngine_);
+
+    return true;
 }
 
 }

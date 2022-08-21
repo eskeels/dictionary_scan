@@ -110,4 +110,42 @@ TEST (DictionaryItemFactoryTest, AllDefault) {
      */
 }
 
+TEST (DictionarySerializeTest, AllDefault) {
+    DLP::Dictionaries ds;
+    std::vector<std::string> words;
+    for (int i = 0; i < 300; ++i) {
+        words.push_back(getWord());
+    }
+    words.push_back("sat");
+
+    AddDictionary( ds, "animals", 1 , words );
+    /*
+       DLP::HSRegexEngine hsre;
+       hsre.Register(&ds);
+       hsre.Initialize();
+       IRegexScanState* rss = hsre.CreateRegexScanState();
+       std::cout << "Created scan state" << std::endl;
+       hsre.Serialize();
+
+       delete rss;
+     */
+    std::vector<uint16_t> dictionaryIds;
+
+    DLP::DictionaryScanner dscanner(&ds);
+    dscanner.Initialize(dictionaryIds);
+    dscanner->Serialize(
+    IScanState* ss = dscanner.CreateScanState();
+
+    std::string input("the cat sat on the mat");
+
+    DLP::DictionaryScanMatches dsm(&ds);
+    dscanner.Scan(&dsm, ss, 0, input.c_str(), input.size(), input.c_str(), input.size());
+
+    /*  DLP::LitRegexEngine chre;
+        chre.Register(&ds);
+        chre.Initialize();
+        chre.Serialize();
+     */
+}
+
 

@@ -48,6 +48,11 @@ target_link_libraries(ut_dictionaryscanner ${TEST_LIBS} hs)
 add_dependencies(ut_dictionaryscanner dictionary_scanner)
 add_test(NAME ut_dictionaryscanner COMMAND ut_dictionaryscanner)
 
+add_executable(ut_dictionaryscanner_serialize ut/ut_dictionaryscanner_serialize.cpp gmain.cpp)
+target_link_libraries(ut_dictionaryscanner_serialize ${TEST_LIBS} hs)
+add_dependencies(ut_dictionaryscanner_serialize dictionary_scanner)
+add_test(NAME ut_dictionaryscanner_serialize COMMAND ut_dictionaryscanner_serialize)
+
 add_executable(ut_normalizer ut/ut_normalizer.cpp gmain.cpp)
 target_link_libraries(ut_normalizer ${TEST_LIBS} utf8proc)
 add_dependencies(ut_normalizer dictionary_scanner)
