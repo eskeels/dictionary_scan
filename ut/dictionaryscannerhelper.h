@@ -93,7 +93,11 @@ class VMatch {
 DLP::DictionaryScanMatches Scan(DLP::Dictionaries& ds, const std::string& txt, uint8_t context);
 DLP::DictionaryScanMatches Scan(DLP::Dictionaries& ds, const std::string& txt, uint8_t context) {
     DLP::DictionaryScanner dscanner(&ds);
-    dscanner.Initialize({});
+    std::string errDesc;
+
+    if (false == dscanner.Initialize({},"","",errDesc)) {
+        std::cout << "Error from Initialize : " << errDesc << std::endl;
+    }
     std::unique_ptr<IScanState> ss(dscanner.CreateScanState());
     DLP::DictionaryScanMatches dsm(&ds);
     dscanner.Scan(&dsm, &*ss, 0, 0, txt.c_str(), txt.size(), txt.c_str(), txt.size(), context);

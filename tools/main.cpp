@@ -93,7 +93,8 @@ int main(int argc, char *argv[]) {
     ReadFileToScan(fileToScan, txt);
 
     DLP::DictionaryScanner dscanner(&dictionaries);
-    dscanner.Initialize({});
+    std::string errDesc;
+    dscanner.Initialize({},"","",errDesc);
     std::unique_ptr<DLP::IScanState> ss(dscanner.CreateScanState());
     DLP::DictionaryScanMatches dsm(&dictionaries);
     uint8_t context = 99;

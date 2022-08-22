@@ -8,7 +8,7 @@ class HSBaseRegexEngine : public RegexEngine {
     public:
         virtual ~HSBaseRegexEngine();
         virtual void RegisterDictionaryItem(uint16_t dictionaryId, const IDictionaryItem* di) = 0;
-        void Initialize() = 0;
+        virtual bool Initialize() = 0;
         virtual bool Initialize(char *bytes, size_t length, std::string& errDesc);
         bool Serialize(char **bytes, size_t *length, std::string& errDesc) = 0;
         virtual unsigned GetFlags(const IDictionaryItem* di) = 0;

@@ -23,7 +23,8 @@ namespace DLP {
         }
     }
 
-    void HSRegexEngine::Initialize() {
+    bool HSRegexEngine::Initialize() {
+        bool ret = true;
         if (expressions_.size() > 0) {
             hs_compile_error_t *compile_err;
             if (hs_compile_multi(&expressions_[0],
@@ -36,9 +37,10 @@ namespace DLP {
                                  &compile_err) != HS_SUCCESS) {
                 fprintf(stderr, "ERROR: Unable to compile: %s\n", compile_err->message);
                 hs_free_compile_error(compile_err);
-                return;
+                ret = false;
             }
         }
+        return ret;
     }
 
     bool HSRegexEngine::Serialize(char **bytes, size_t *length, std::string& errDesc) {

@@ -23,7 +23,8 @@ namespace DLP {
         }
     }
 
-    void LitRegexEngine::Initialize() {
+    bool LitRegexEngine::Initialize() {
+        bool ret = true;
         if (expressions_.size()>0) {
             hs_compile_error_t *compile_err;
             if (hs_compile_lit_multi(&expressions_[0],
@@ -37,9 +38,10 @@ namespace DLP {
                                  &compile_err) != HS_SUCCESS) {
                 fprintf(stderr, "ERROR: Unable to compile: %s\n", compile_err->message);
                 hs_free_compile_error(compile_err);
-                return;
+                ret = false;
             }
         }
+        return ret;
     }
 
 // TODO : put into HSBAseRegexEngine

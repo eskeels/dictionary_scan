@@ -25,26 +25,21 @@ TEST (DictionaryEmpty, AllDefault) {
 TEST (DictionaryOneItem, AllDefault) {
 
     DLP::Dictionaries ds;
-    std::vector<std::string> words { "sat", "mat" };
 
-    AddDictionary( ds, "animals", 1 , words, TermType::LITERAL );
-    /*
-       DLP::HSRegexEngine hsre;
-       hsre.Register(&ds);
-       hsre.Initialize();
-       IRegexScanState* rss = hsre.CreateRegexScanState();
-       std::cout << "Created scan state" << std::endl;
-       hsre.Serialize();
+    AddDictionary( ds, "animals", 1 , { "mat", "sat" }, TermType::LITERAL );
 
-       delete rss;
-     */
-   std::string txt("the cat sat on the mat");
+    std::string txt("the cat sat on the mat");
     std::string errDesc;
 
+    {
     DLP::DictionaryScanner dscanner(&ds);
-    dscanner.Initialize({},"aaa");
-//    dscanner.Serialize("aaa",errDesc);
+    dscanner.Initialize({},"", "", errDesc);
+    dscanner.Serialize("literal-db.bin", "regex-db.bin", errDesc);
+    }
 
+    DLP::DictionaryScanner dscanner(&ds);
+    dscanner.Initialize({},"literal-db.bin", "regex-db.bin", errDesc);
+  
     std::unique_ptr<IScanState> ss(dscanner.CreateScanState());
     DLP::DictionaryScanMatches dsm(&ds);
     dscanner.Scan(&dsm, &*ss, 0, 0, txt.c_str(), txt.size(), txt.c_str(), txt.size(), 0);
@@ -52,7 +47,7 @@ TEST (DictionaryOneItem, AllDefault) {
     size_t idx = 0;
     Match* pm = dsm.GetFirstMatch(idx);
     while (pm) {
-        std::cout << "Matched at " << pm->GetFrom() << std::endl;
+        std::cout << "Matched at " << pm->GetFrom() << " " << pm->GetItemId() << " " << std::endl;
         pm = dsm.GetNextMatch(idx);
     }
 

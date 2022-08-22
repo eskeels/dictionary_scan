@@ -20,13 +20,13 @@ class DictionaryScanner : public IScanner {
         DictionaryScanner(const Dictionaries* ds);
         ~DictionaryScanner();
     
-        void Initialize(const std::vector<uint16_t>& dictionaryIds, const std::string& filename = "");
+        bool Initialize(const std::vector<uint16_t>& dictionaryIds, const std::string& literalDBFileName, const std::string& regexDBFileName, std::string& errorDesc);
 
         IScanState* CreateScanState() const;
 
         void Scan(IScanMatches* sm, IScanState* ss, size_t offset, size_t overlap, const char * input, size_t ilen, const char * normalized, size_t nlen, uint8_t context, size_t matchLimit = 100000) const;
 
-        bool Serialize(const std::string& fileName, std::string& errorDesc) const;
+        bool Serialize(const std::string& literalDBFileName, const std::string& regexDBFileName, std::string& errorDesc) const;
     protected:
         const Dictionaries* dictionaries_;
         HSRegexEngine* regexEngine_ = nullptr;

@@ -26,26 +26,32 @@ std::vector<char> readFile(const std::string& filename)
                               std::istreambuf_iterator<char>());
 }
 
-void DictionaryScanner::Initialize(const std::vector<uint16_t>& /*dictionaryIds*/, const std::string& filename) {
+bool DictionaryScanner::Initialize(const std::vector<uint16_t>& /*dictionaryIds*/, 
+                                    const std::string& literalDBFileName,
+                                    const std::string& regexDBFileName,
+                                    std::string& errorDesc) {
+    bool ret = false;
     regexEngine_->Register(dictionaries_);
     litRegexEngine_->Register(dictionaries_);
     if (regexEngine_->GetItemCount() > 0) {
-
-        regexEngine_->Initialize();
-    }
-    if (litRegexEngine_->GetItemCount() > 0) {
-// TODO: add file name
-// load byte from disk
-// pass bytes + size into Initialize()
-        
-        if (!filename.empty()) {
-            std::vector<char> dbFromFile = readFile("literal-db.bin");
-            std::string errDesc;
-            litRegexEngine_->Initialize((char *)&dbFromFile[0], (size_t)dbFromFile.size(), errDesc);    
+        if (!regexDBFileName.empty()) {
+            std::vector<char> dbFromFile = readFile(regexDBFileName);
+            ret = regexEngine_->Initialize((char *)&dbFromFile[0], (size_t)dbFromFile.size(), errorDesc);
         } else {
-            litRegexEngine_->Initialize();
+            ret = regexEngine_->Initialize();
         }
     }
+
+    if (litRegexEngine_->GetItemCount() > 0) {
+        if (!literalDBFileName.empty()) {
+            std::vector<char> dbFromFile = readFile(literalDBFileName);
+            ret = litRegexEngine_->Initialize((char *)&dbFromFile[0], (size_t)dbFromFile.size(), errorDesc);    
+        } else {
+            ret = litRegexEngine_->Initialize();
+        }
+    }
+
+    return ret;
 }
 
 IScanState* DictionaryScanner::CreateScanState() const {
@@ -104,28 +110,30 @@ void DictionaryScanner::Scan(IScanMatches* sm, IScanState* ss, size_t offset, si
     }
 }
 
-void writeDBToFile(const std::string& filename, IRegexEngine* regexEngine) {
+bool writeDBToFile(const std::string& filename, IRegexEngine* regexEngine, std::string& errorDesc) {
+    bool ret = true;
     if (regexEngine->GetItemCount()) {
-        char *bytesDb;
+        char *bytesDb = nullptr;
         size_t length;
         std::ofstream outFile(filename.c_str(), std::ios::out | std::ios::binary);
         std::cout << "Count is " << regexEngine->GetItemCount() << std::endl;
-        std::string errorDesc;
-        regexEngine->Serialize(&bytesDb, &length, errorDesc);
-        outFile.write(bytesDb, length);
-        outFile.close();
-        // TODO: free bytesDB
+        ret = regexEngine->Serialize(&bytesDb, &length, errorDesc);
+        if (ret) {
+            outFile.write(bytesDb, length);
+            outFile.close();
+            free(bytesDb);
+        }
     }
+    return ret;
 }
  
-bool DictionaryScanner::Serialize(const std::string& fileName, std::string& errorDesc) const {
-    std::cout << fileName << std::endl;
-    errorDesc = "";
+bool DictionaryScanner::Serialize(const std::string& literalDBFileName, const std::string& regexDBFileName, std::string& errorDesc) const {
+    bool ret = writeDBToFile(literalDBFileName, litRegexEngine_, errorDesc);
+    if (ret) {
+        writeDBToFile(regexDBFileName, regexEngine_, errorDesc);
+    }
 
-    writeDBToFile("literal-db.bin", litRegexEngine_);
-    writeDBToFile("regex-db.bin", regexEngine_);
-
-    return true;
+    return ret;
 }
 
 }

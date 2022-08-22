@@ -13,8 +13,8 @@ class HSRegexEngine : public HSBaseRegexEngine {
     public:
         ~HSRegexEngine();
         void RegisterDictionaryItem(uint16_t dictionaryId, const IDictionaryItem* di);
-
-        void Initialize();
+        using HSBaseRegexEngine::Initialize;
+        bool Initialize();
         bool Serialize(char **bytes, size_t *length, std::string& errDesc);
 
         unsigned GetFlags(const IDictionaryItem* di) {
