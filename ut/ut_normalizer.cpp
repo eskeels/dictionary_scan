@@ -80,4 +80,18 @@ TEST (NormalizerTest, full) {
     }
 }
 
+TEST (NormalizerTest, newlineOnly) {
+    std::string s = "\n";
+    size_t newLen;
+    std::string sresult = normalize(&s[0], s.size(), true, true, true, newLen, true);
+    EXPECT_EQ(sresult, " ");
+}
+
+TEST (NormalizerTest, empty) {
+    std::string s = "";
+    size_t newLen;
+    std::string sresult = normalize(&s[0], s.size(), true, true, true, newLen, true);
+    EXPECT_EQ(sresult, "");
+}
+
 
