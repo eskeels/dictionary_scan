@@ -35,6 +35,8 @@ class DictionaryItem : public IDictionaryItem {
         bool IsCaseSensitive() const { return caseSensitive_; }
         bool IsLiteral() const { return false; }
         bool IsPartial() const { return partial_; }
+        uint16_t GetVerificationId() const = 0; 
+
     protected:
         int16_t score_;
         bool distinct_;
@@ -56,6 +58,7 @@ class Literal : public DictionaryItem {
         }
 
         bool IsLiteral() const { return true; }
+        uint16_t GetVerificationId() const { return 0; } 
 };
 
 class Regex : public DictionaryItem {
@@ -65,14 +68,16 @@ class Regex : public DictionaryItem {
               bool partial,
               bool caseSensitive,
               uint16_t id,
-              uint16_t valgoId,
+              uint16_t verificationId,
               std::string regex) : DictionaryItem(score,distinct,partial,caseSensitive,id,regex)
         {
-            valgoId_ = valgoId;
+            verificationId_ = verificationId;
         }
 
+        uint16_t GetVerificationId() const { return verificationId_; } 
+
     protected:
-        uint16_t valgoId_;
+        uint16_t verificationId_;
 
 };
 /*

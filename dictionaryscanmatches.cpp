@@ -181,6 +181,20 @@ bool DictionaryScanMatches::CheckPartial(const Match& match) {
     }
 }
 
+bool DictionaryScanMatches::CheckVerificationRoutine(const Match& match, uint16_t /*dictionaryId*/) {
+    uint16_t vid = match.GetVerificationId();
+    if (vid != 0) {
+    // use match to get dictionaryItem and validationId
+    // apply validation
+//        size_t to = match.GetTo();
+// use input_ and len_
+
+    // validation starts from end
+    // remember it's utf-8
+    }
+    return false;
+}
+
 void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
     if (CheckDistinct(match, dictionaryId)) {
         // match was distinct and we already have a hit
@@ -189,6 +203,11 @@ void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
 
     if (overlap_ > 0 && CheckOverlap(match, dictionaryId)) {
         // match was in an overlap and was a duplicate
+        return;
+    }
+
+    if (CheckVerificationRoutine(match, dictionaryId)) {
+        // match failed verification routine
         return;
     }
 

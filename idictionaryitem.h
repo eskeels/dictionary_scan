@@ -16,6 +16,7 @@ class IDictionaryItem {
         virtual bool IsCaseSensitive() const = 0;
         virtual bool IsLiteral() const = 0;
         virtual bool IsPartial() const = 0;
+        virtual uint16_t GetVerificationId() const = 0; 
         virtual ~IDictionaryItem() {};
 };
 }

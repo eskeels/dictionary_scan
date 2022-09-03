@@ -63,6 +63,10 @@ class Match {
             return dictionaryItem_->IsPartial();
         }
 
+        uint16_t GetVerificationId() const {
+            return dictionaryItem_->GetVerificationId();
+        }
+
     protected:
         const IDictionaryItem* dictionaryItem_;
         unsigned long long from_;
@@ -153,6 +157,7 @@ class DictionaryScanMatches : public IScanMatches {
         bool CheckDistinct(const Match& match, uint16_t dictionaryId);
         bool CheckOverlap(const Match& match, uint16_t dictionaryId);
         bool CheckPartial(const Match& match);
+        bool CheckVerificationRoutine(const Match& match, uint16_t dictionaryId);
 
         std::string GetSnippet(const Match& match, size_t affix);
 
