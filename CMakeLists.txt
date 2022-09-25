@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(.)
 link_directories(.)
 
+include_directories(./verifications)
+
 include_directories(${CMAKE_SOURCE_DIR}/../utf8proc)
 link_directories(${CMAKE_SOURCE_DIR}/../utf8proc/build)
 
@@ -14,7 +16,11 @@ link_directories(${CMAKE_SOURCE_DIR}/../googletest/build/lib)
 include_directories(${CMAKE_SOURCE_DIR}/../hyperscan/src)
 link_directories(${CMAKE_SOURCE_DIR}/../hyperscan/lib)
 
-add_library(dictionary_scanner dictionaryscanstate.cpp dictionaryscanner.cpp hsregexscanstate.cpp litregexengine.cpp hsbaseregexengine.cpp dictionaries.cpp dictionaryscanmatches.cpp dictionary.cpp dictionaryitemfactory.cpp hsregexengine.cpp regexengine.cpp dictionaryparser.cpp json11.cpp normalizer.cpp)
+set(VERIFICATIONS
+    verifications/verification.cpp
+    verifications/ukni.cpp)
+
+add_library(dictionary_scanner ${VERIFICATIONS} dictionaryscanstate.cpp dictionaryscanner.cpp hsregexscanstate.cpp litregexengine.cpp hsbaseregexengine.cpp dictionaries.cpp dictionaryscanmatches.cpp dictionary.cpp dictionaryitemfactory.cpp hsregexengine.cpp regexengine.cpp dictionaryparser.cpp json11.cpp normalizer.cpp)
 
 target_compile_options(dictionary_scanner PRIVATE -Wall -Wextra -Wpedantic -Werror)
 
