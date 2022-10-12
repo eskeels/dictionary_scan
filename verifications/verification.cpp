@@ -28,7 +28,7 @@ std::wstring Verification::GetVerificationTerm(const char* input,
             // TODO: -1 will read up to 4 bytes, make sure that isnt off the end
             utf8proc_int32_t cp = 0;
             if (utf8proc_iterate((const utf8proc_uint8_t*)p, 4, &cp) <= 0) {
-                // error so default cp to *p
+              // error so default cp to *p
                 cp = *p;
             }
             bool keep = true;

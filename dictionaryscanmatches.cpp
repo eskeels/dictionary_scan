@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "dictionaryscanmatches.h"
+#include "verificationfactory.h"
 
 namespace DLP {
 
@@ -184,6 +185,11 @@ bool DictionaryScanMatches::CheckPartial(const Match& match) {
 bool DictionaryScanMatches::CheckVerificationRoutine(const Match& match, uint16_t /*dictionaryId*/) {
     uint16_t vid = match.GetVerificationId();
     if (vid != 0) {
+        IVerification* vp = VerificationFactory::CreateVerification(vid);
+        std::wstring out;
+        const char* matchStartPos;
+
+        return vp->Verify(input_, len_, match.GetTo(), out, matchStartPos);
     // use match to get dictionaryItem and validationId
     // apply validation
 //        size_t to = match.GetTo();
@@ -217,10 +223,12 @@ void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
         return;
     }
 
+    // Check for proximity, don't add to score
     RecordScore(match, dictionaryId);
     matchedDictionaryIds_.insert(dictionaryId);
 
     // check match limit
+// TODO: Maybe proximity matches are excluded from matchLimit?
     if (matches_.size() >= matchLimit_) {
         return;
     }

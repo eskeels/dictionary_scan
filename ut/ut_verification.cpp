@@ -27,8 +27,8 @@ std::setlocale(LC_ALL, "en_US.utf8");
     std::string s = "abc Jc1234 5  6  q pp";
     std::wstring out;
     const char* startPos = 0;
-    UKNI ukni;
-    std::cout << ukni.Verify(&s[0], s.size(), 17, out, startPos) << std::endl;
+    IVerification* ukni = VerificationFactory::CreateVerification(1);
+    std::cout << ukni->Verify(&s[0], s.size(), 17, out, startPos) << std::endl;
     std::cout << wstring_to_utf8(out) << std::endl;
     std::cout << "Start pos is " << *startPos << std::endl;
 }

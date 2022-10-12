@@ -35,11 +35,11 @@ class DictionaryItemFactory {
             return itemId_;
         }
  
-        IDictionaryItem* CreateRegex(const std::string& term, int16_t* score, bool* distinct, bool* partial, bool* caseSensitive);
-        IDictionaryItem* CreateLiteral(const std::string& literal, int16_t* score, bool* distinct, bool* partial, bool* caseSensitive);
+        IDictionaryItem* CreateRegex(const std::string& term, int16_t* score, bool* distinct, bool* partial, bool* caseSensitive, bool proximity = false);
+        IDictionaryItem* CreateLiteral(const std::string& literal, int16_t* score, bool* distinct, bool* partial, bool* caseSensitive, bool proximity = false);
 
         IDictionaryItem* CreatePhrase(int16_t* score, bool* distinct, bool* caseSensitive, uint8_t distance, std::vector<std::string> terms);
-        IDictionaryItem* CreateProximity(int16_t* score, bool* distinct, bool* caseSensitive, uint8_t distance, std::vector<std::string> terms);
+        std::vector<IDictionaryItem*> CreateLiteralProximity(int16_t* score, bool* distinct, bool* partial, bool* caseSensitive, uint8_t distance, std::vector<std::string> terms);
 
     protected:
         int16_t defaultScore_;
