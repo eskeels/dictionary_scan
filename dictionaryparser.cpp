@@ -99,6 +99,9 @@ namespace DLP {
     }
 
     void DictionaryJSONParser::Parse(Dictionaries& dictionaries) {
+        uint16_t dictionaryId = 0;
+        uint16_t revision = 0;
+
         DictionaryItemFactory factory;
         std::string err;
         auto t_obj = json11::Json::parse(input_,err);
@@ -107,11 +110,12 @@ namespace DLP {
             if (!d_arr.is_null()) {
 
                 for (const json11::Json& jDic : d_arr.array_items()) {
-                    uint16_t dictionaryId = 0;
-                    uint16_t revision = 0;
                     std::string name;
                     ParseDictionaryAttributes(jDic, name, dictionaryId, revision);
-
+                    if (dictionaryId == 0) {
+                        dictionaryId = dictIdSeqGen_;
+                        ++dictIdSeqGen_;
+                    } 
                     Dictionary* dictionary = new Dictionary(name, dictionaryId, revision);
                     ParseLiterals(jDic["literals"], factory, dictionary);
                     ParseRegexes(jDic["regexes"], factory, dictionary);

@@ -17,6 +17,7 @@ class IDictionaryItem {
         virtual bool IsLiteral() const = 0;
         virtual bool IsPartial() const = 0;
         virtual bool IsProximity() const = 0;
+        virtual uint16_t GetProximityId() const = 0;
         virtual uint16_t GetVerificationId() const = 0; 
         virtual ~IDictionaryItem() {};
 };

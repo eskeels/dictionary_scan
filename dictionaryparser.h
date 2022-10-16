@@ -19,6 +19,7 @@ namespace DLP {
             void ParseRegexes(const json11::Json& regexes, DictionaryItemFactory& factory, Dictionary* dictionary); 
             void ParseDictionaryAttributes(const json11::Json& jDic, std::string& name, uint16_t& dictionaryId, uint16_t& revision);
 
-            const std::string& input_;  
+            const std::string& input_;
+            uint16_t dictIdSeqGen_ = 101;  
     };
 }

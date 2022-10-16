@@ -52,6 +52,51 @@ void AddDictionary( DLP::Dictionaries& ds,
     ds.Add(d);
 }
 
+void AddProximityDictionary( DLP::Dictionaries& ds,
+                    const std::string& name,
+                    uint16_t id,
+                    const std::vector<std::string> terms,
+                    TermType ttype,
+                    uint8_t distance,
+                    int16_t score = 10,
+                    bool partial = false,
+                    bool distiinct = false,
+                    bool caseSens = true);
+
+void AddProximityDictionary( DLP::Dictionaries& ds,
+                    const std::string& name,
+                    uint16_t id,
+                    const std::vector<std::string> terms,
+                    TermType ttype,
+                    uint8_t distance,
+                    int16_t score,
+                    bool partial,
+                    bool distiinct,
+                    bool caseSens) {
+    DLP::DictionaryItemFactory ifactory;
+    ifactory.SetDefaults(score,
+            distiinct,      // distinct
+            partial,        // partial
+            caseSens,       // case sensitive
+            10);            // distance
+
+    DLP::Dictionary* d = new Dictionary(name, id, 1);
+    std::vector<const IDictionaryItem*> proxItems;
+    for ( auto& t : terms ) {
+        if (ttype == LITERAL) {
+            proxItems.push_back(ifactory.CreateLiteral(t,nullptr,nullptr,nullptr,nullptr,true));
+        } else {
+            proxItems.push_back(ifactory.CreateRegex(t,nullptr,nullptr,nullptr,nullptr,true));
+        }
+    }
+
+    if (ttype == LITERAL) {
+        d->AddLiteralProximity(proxItems, distance);
+    }
+    ds.Add(d);
+}
+
+
 std::string getWord();
 
 std::string getWord() {

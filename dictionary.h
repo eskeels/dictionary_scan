@@ -18,8 +18,8 @@ class Dictionary {
               id_(id),
               rev_(rev) {}
         ~Dictionary();
-        void Add(const IDictionaryItem* item);
-
+        uint16_t Add(const IDictionaryItem* item);
+        void AddLiteralProximity(std::vector<const IDictionaryItem*> items, uint8_t distance);
         const IDictionaryItem* GetDictionaryItem(uint16_t id) const;
         uint16_t GetId() const { return id_; }
         const std::string& GetName() const { return name_; }
@@ -39,5 +39,13 @@ class Dictionary {
         uint16_t id_;
         // revision number of dictionary
         uint16_t rev_;
+        // proximity count
+        uint16_t proximityCount_ = 0;
+        // proximity map
+        // proximity id to offset into items_ vector
+        std::unordered_map<uint16_t, std::vector<uint16_t>> proximityItems_;
+        // proximity id to distance
+        std::unordered_map<uint16_t, uint8_t> proximityDistance_;
+
 };
 }

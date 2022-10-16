@@ -223,18 +223,25 @@ void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
         return;
     }
 
-    // Check for proximity, don't add to score
-    RecordScore(match, dictionaryId);
+    // Check for proximity
+    if (match.IsProximity()) {
+        // This should be a function
+        std::cout << "Got proximity" << std::endl;
+        proximityMatches_.push_back(match);
+        matchedProximities_.insert(std::make_pair(dictionaryId,match.GetProximityId()));
+    } else {
+        // ignore score for now
+        RecordScore(match, dictionaryId);
+    }
     matchedDictionaryIds_.insert(dictionaryId);
 
     // check match limit
-// TODO: Maybe proximity matches are excluded from matchLimit?
     if (matches_.size() >= matchLimit_) {
         return;
     }
     matches_.push_back(match);
     uint32_t idx = (uint32_t)matches_.size()-1;
-    
+
     auto it = dictionariesMatchIndx_.find(dictionaryId);
     if (it == dictionariesMatchIndx_.end()) {
         // not found so create
@@ -249,7 +256,7 @@ void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, 
 
     const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
     if (dictionaryItem) {
-        RecordMatch(Match(dictionaryItem, from, to, context_),dictionaryId);
+        RecordMatch(Match(dictionaryItem, dictionaryId, from, to, context_),dictionaryId);
     } else {
         // TODO: Trying to add a match with no corresponding entry in dictionary
         // raise error / warning
@@ -261,10 +268,23 @@ void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, 
 
     const IDictionaryItem* dictionaryItem = dictionaries_->GetDictionaryItem(dictionaryId, itemId);
     if (dictionaryItem) {
-        RecordMatch(Match(dictionaryItem, to, context_), dictionaryId);
+        RecordMatch(Match(dictionaryItem, dictionaryId, to, context_), dictionaryId);
     } else {
         // TODO: Trying to add a match with no corresponding entry in dictionary
         // raise error / warning
+    }
+}
+
+void DictionaryScanMatches::ResolveProximity() {
+    if (!proximityMatches_.empty()) {
+       // need to find all the matches for the same proximityId and dictionaryId
+
+        // - Iterate  matchedProximities_
+        // - for each pair, iterate proximityMatches_ and collate a list
+        //   of matches for that dictionary / proximity
+        // - iterate that list to see if any proximities trigger
+        // - update score for triggers
+        // - any leftover matches should be removed from match list (or reset to avoid re-alloc)
     }
 }
 

@@ -19,14 +19,14 @@ class DictionaryItem : public IDictionaryItem {
                        bool caseSensitive,
                        uint16_t id,
                        std::string regex,
-                       bool proximity) :
+                       uint16_t proximityId) :
                 score_(score),
                 distinct_(distinct),
                 partial_(partial),
                 caseSensitive_(caseSensitive),
                 id_(id),
                 regex_(regex),
-                proximity_(proximity) {}
+                proximityId_(proximityId) {}
 
         ~DictionaryItem() {}
 
@@ -37,7 +37,8 @@ class DictionaryItem : public IDictionaryItem {
         bool IsCaseSensitive() const { return caseSensitive_; }
         bool IsLiteral() const { return false; }
         bool IsPartial() const { return partial_; }
-        bool IsProximity() const { return proximity_; }
+        bool IsProximity() const { return proximityId_ != 0; }
+        uint16_t GetProximityId() const { return proximityId_; }
         uint16_t GetVerificationId() const = 0; 
 
     protected:
@@ -47,7 +48,7 @@ class DictionaryItem : public IDictionaryItem {
         bool caseSensitive_;
         uint16_t id_;
         std::string regex_;
-        bool proximity_;
+        uint16_t proximityId_;
 };
 
 class Literal : public DictionaryItem {

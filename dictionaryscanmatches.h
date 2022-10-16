@@ -9,12 +9,14 @@ namespace DLP {
 class IScanMatches {
     public:
         virtual ~IScanMatches() {};
+        virtual void ResolveProximity() = 0;
 };
 
 class Match {
     public:
-        Match(const IDictionaryItem* dictionaryItem, unsigned long long from, unsigned long long to, uint8_t context)
+        Match(const IDictionaryItem* dictionaryItem, uint16_t dictionaryId, unsigned long long from, unsigned long long to, uint8_t context)
             : dictionaryItem_(dictionaryItem),
+              dictionaryId_(dictionaryId),
               from_(from),
               gotFrom_(true),
               to_(to),
@@ -22,8 +24,9 @@ class Match {
         {
         }
 
-        Match(const IDictionaryItem* dictionaryItem, unsigned long long to, uint8_t context)
+        Match(const IDictionaryItem* dictionaryItem, uint16_t dictionaryId, unsigned long long to, uint8_t context)
             : dictionaryItem_(dictionaryItem),
+              dictionaryId_(dictionaryId),
               from_(0),
               gotFrom_(false),
               to_(to),
@@ -63,12 +66,24 @@ class Match {
             return dictionaryItem_->IsPartial();
         }
 
+        bool IsProximity() const {
+            return dictionaryItem_->IsProximity();
+        }
+
+        uint16_t GetProximityId() const {
+            return dictionaryItem_->GetProximityId();
+        }
+
         uint16_t GetVerificationId() const {
             return dictionaryItem_->GetVerificationId();
         }
 
+        uint16_t GetDictionaryId() const {
+            return dictionaryId_;
+        }
     protected:
         const IDictionaryItem* dictionaryItem_;
+        uint16_t dictionaryId_;
         unsigned long long from_;
         bool gotFrom_ = false;
         unsigned long long to_;
@@ -80,6 +95,7 @@ class DictionaryScanMatches : public IScanMatches {
         DictionaryScanMatches(const Dictionaries* dictionaries);
         ~DictionaryScanMatches();
 
+        void ResolveProximity();
         void SetInputBuffer(const char* input, size_t len);
         void SetContext(uint8_t context);
         void SetOffset(size_t offset);
@@ -93,6 +109,7 @@ class DictionaryScanMatches : public IScanMatches {
             return GetNextMatch(idx);
         }
 
+        // TODO: Cater for disabled matches
         Match* GetNextMatch(size_t& idx) {
             if (idx >= GetMatchCount()){
                 return nullptr;
@@ -104,6 +121,7 @@ class DictionaryScanMatches : public IScanMatches {
         }
 
         size_t GetMatchCount() const {
+            // TODO: Cater for disabled matches
             return matches_.size();
         }
 
@@ -165,11 +183,15 @@ class DictionaryScanMatches : public IScanMatches {
         const char* input_ = nullptr;
         size_t len_ = 0;
         std::vector<Match> matches_;
+        std::vector<Match> proximityMatches_;
+
         // dictionary id to offset in matches_ index. So we can
         // find all matches for a dictionary
         std::unordered_map<uint16_t, std::vector<uint32_t>> dictionariesMatchIndx_;
         // dictionary ids that have matched
         std::set<uint16_t> matchedDictionaryIds_;
+        // dictionary id - proximity ids of matched proximities
+        std::set<std::pair<uint16_t,uint16_t>> matchedProximities_;
         // total score for the scan
         int64_t score_ = 0;
         // dictionary id to score

@@ -7,10 +7,25 @@ namespace DLP {
 Dictionary::~Dictionary() {
 }
 
-void Dictionary::Add(const IDictionaryItem* item) {
+uint16_t Dictionary::Add(const IDictionaryItem* item) {
     items_.push_back(std::move(std::unique_ptr<const IDictionaryItem>(item)));
     uint16_t pos = static_cast<uint16_t>(items_.size()) - 1;
     itemsIndx_.insert(std::make_pair(item->GetId(), pos));
+    return pos;
+}
+
+void Dictionary::AddLiteralProximity(std::vector<const IDictionaryItem*> items, uint8_t distance) {
+    distance = distance;
+    std::vector<uint16_t> itemIds;
+    for (auto di : items) {
+        if (!di->IsProximity()) {
+            std::cerr << "ERROR: Proximity flag not set!" << std::endl;
+        }
+        itemIds.push_back(Add(di));
+    }
+    proximityItems_.insert(std::make_pair(proximityCount_, itemIds));
+    proximityDistance_.insert(std::make_pair(proximityCount_, distance));
+    ++proximityCount_; 
 }
 
 const IDictionaryItem* Dictionary::GetDictionaryItem(uint16_t id) const {
