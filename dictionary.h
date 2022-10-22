@@ -19,7 +19,7 @@ class Dictionary {
               rev_(rev) {}
         ~Dictionary();
         uint16_t Add(const IDictionaryItem* item);
-        void AddLiteralProximity(std::vector<const IDictionaryItem*> items, uint8_t distance);
+        uint16_t AddLiteralProximity(std::vector<const IDictionaryItem*> items, uint8_t distance);
         const IDictionaryItem* GetDictionaryItem(uint16_t id) const;
         uint16_t GetId() const { return id_; }
         const std::string& GetName() const { return name_; }
@@ -28,6 +28,13 @@ class Dictionary {
             return GetNextDictionaryItem(idx);
         }
         const IDictionaryItem* GetNextDictionaryItem(size_t& idx) const;
+        uint8_t GetProximityDistance(uint16_t proximityId) const {
+            auto it = proximityDistance_.find(proximityId);
+            if (it != proximityDistance_.end()) {
+                return it->second;
+            }
+            return 0;
+        }    
     protected:
         // all the items in this dictionary
         std::vector<std::unique_ptr<const IDictionaryItem>> items_;
@@ -39,8 +46,8 @@ class Dictionary {
         uint16_t id_;
         // revision number of dictionary
         uint16_t rev_;
-        // proximity count
-        uint16_t proximityCount_ = 0;
+        // proximity count. Used for id.
+        uint16_t proximityCount_ = 1;
         // proximity map
         // proximity id to offset into items_ vector
         std::unordered_map<uint16_t, std::vector<uint16_t>> proximityItems_;

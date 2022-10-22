@@ -81,6 +81,22 @@ class Match {
         uint16_t GetDictionaryId() const {
             return dictionaryId_;
         }
+
+        bool IsProximityMatch(const Match& rhs, uint8_t distance) const {
+            // match distance
+            unsigned long long md = 0;
+            if (this->to_ > rhs.to_) {
+                md = this->to_ - rhs.to_;
+            } else {
+                md = rhs.to_ - this->to_;
+            }
+   
+            if (md <= distance) {
+                return true;
+            }
+            return false;    
+        }
+
     protected:
         const IDictionaryItem* dictionaryItem_;
         uint16_t dictionaryId_;
@@ -190,7 +206,7 @@ class DictionaryScanMatches : public IScanMatches {
         std::unordered_map<uint16_t, std::vector<uint32_t>> dictionariesMatchIndx_;
         // dictionary ids that have matched
         std::set<uint16_t> matchedDictionaryIds_;
-        // dictionary id - proximity ids of matched proximities
+        // dictionary id to proximity ids of matched proximities
         std::set<std::pair<uint16_t,uint16_t>> matchedProximities_;
         // total score for the scan
         int64_t score_ = 0;

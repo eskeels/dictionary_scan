@@ -108,8 +108,7 @@ void DictionaryScanner::Scan(IScanMatches* sm, IScanState* ss, size_t offset, si
             printf("LIT ERROR FROM SCAN!!!");
         }
     }
-
-    // TODO sort out proximity
+    dsm->ResolveProximity();
 }
 
 bool writeDBToFile(const std::string& filename, IRegexEngine* regexEngine, std::string& errorDesc) {

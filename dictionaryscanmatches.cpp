@@ -226,7 +226,7 @@ void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
     // Check for proximity
     if (match.IsProximity()) {
         // This should be a function
-        std::cout << "Got proximity" << std::endl;
+        std::cout << "Got proximity " << match.GetItemId() << std::endl;
         proximityMatches_.push_back(match);
         matchedProximities_.insert(std::make_pair(dictionaryId,match.GetProximityId()));
     } else {
@@ -280,10 +280,49 @@ void DictionaryScanMatches::ResolveProximity() {
        // need to find all the matches for the same proximityId and dictionaryId
 
         // - Iterate  matchedProximities_
-        // - for each pair, iterate proximityMatches_ and collate a list
-        //   of matches for that dictionary / proximity
-        // - iterate that list to see if any proximities trigger
-        // - update score for triggers
+        for(auto mp : matchedProximities_) {
+            std::vector<Match> relatedMatches;
+            const uint16_t dictionaryId = mp.first;
+            const uint16_t proximityId = mp.second;
+            // - for each pair, iterate proximityMatches_ and collate a list
+            for (auto proxMatch : proximityMatches_) {
+                //   of matches for that dictionary / proximity
+                if (proxMatch.GetDictionaryId() == dictionaryId 
+                    && proxMatch.GetProximityId() == proximityId) {
+                    std::cout << "Adding match " << &proxMatch << " " << proxMatch.GetDictionaryId() << " " << proxMatch.GetItemId() << std::endl;
+                    relatedMatches.push_back(proxMatch);
+                }
+            }
+            auto dict = dictionaries_->GetDictionary(dictionaryId);
+            uint8_t distance = 0;
+            if (dict) {
+                distance = dict->GetProximityDistance(proximityId);
+            }
+            std::cout << "Distance is: " << (int)distance << std::endl;
+            for (auto m : relatedMatches) {
+                std::cout << "Match: dictionary Id " << m.GetDictionaryId() << " Prox id " << m.GetProximityId() << std::endl;
+                std::cout << "Match id " << m.GetItemId() << std::endl;
+            }
+
+            for (size_t i = 0; i < relatedMatches.size(); ++i) {
+                for (size_t j = 0; j < relatedMatches.size(); ++j) {
+                    if (i==j) {
+                        continue;
+                    }
+// TODO: Skip match if disabled
+        std::cout <<"comparing " << i << " to " << j << std::endl;
+                    if (relatedMatches[i].IsProximityMatch(relatedMatches[j], distance)) {
+                        std::cout << "Got proximity match" << std::endl;
+                        RecordScore(relatedMatches[i], dictionaryId);
+                        RecordScore(relatedMatches[j], dictionaryId);
+// TODO: Disable match
+                        break;
+                    } else {
+                        std::cout << "Proximity DIDNT match" << std::endl;
+                    }
+                }
+            }
+        }
         // - any leftover matches should be removed from match list (or reset to avoid re-alloc)
     }
 }

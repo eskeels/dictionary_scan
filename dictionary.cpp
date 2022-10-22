@@ -14,8 +14,7 @@ uint16_t Dictionary::Add(const IDictionaryItem* item) {
     return pos;
 }
 
-void Dictionary::AddLiteralProximity(std::vector<const IDictionaryItem*> items, uint8_t distance) {
-    distance = distance;
+uint16_t Dictionary::AddLiteralProximity(std::vector<const IDictionaryItem*> items, uint8_t distance) {
     std::vector<uint16_t> itemIds;
     for (auto di : items) {
         if (!di->IsProximity()) {
@@ -23,9 +22,11 @@ void Dictionary::AddLiteralProximity(std::vector<const IDictionaryItem*> items, 
         }
         itemIds.push_back(Add(di));
     }
-    proximityItems_.insert(std::make_pair(proximityCount_, itemIds));
-    proximityDistance_.insert(std::make_pair(proximityCount_, distance));
-    ++proximityCount_; 
+    uint16_t proximityId = proximityCount_;
+    proximityItems_.insert(std::make_pair(proximityId, itemIds));
+    proximityDistance_.insert(std::make_pair(proximityId, distance));
+    ++proximityCount_;
+    return proximityId;
 }
 
 const IDictionaryItem* Dictionary::GetDictionaryItem(uint16_t id) const {
