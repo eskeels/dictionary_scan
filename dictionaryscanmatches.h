@@ -83,6 +83,11 @@ class Match {
         }
 
         bool IsProximityMatch(const Match& rhs, uint8_t distance) const {
+            // ignore existing matches
+            if (IsProximityMatch() || rhs.IsProximityMatch()) {
+                return false;
+            }
+
             // match distance
             unsigned long long md = 0;
             if (this->to_ > rhs.to_) {
@@ -97,6 +102,21 @@ class Match {
             return false;    
         }
 
+        void SetProximityMatch() {
+            proximityMatch_ = true;
+        }
+
+        bool IsProximityMatch() const {
+            return proximityMatch_;
+        }
+    
+        bool IsDisabled() const {
+            return disabled_;
+        }
+
+        void DisableMatch() {
+            disabled_ = true;
+        } 
     protected:
         const IDictionaryItem* dictionaryItem_;
         uint16_t dictionaryId_;
@@ -104,6 +124,8 @@ class Match {
         bool gotFrom_ = false;
         unsigned long long to_;
         uint8_t context_;
+        bool proximityMatch_ = false;
+        bool disabled_ = false;
 };
 
 class DictionaryScanMatches : public IScanMatches {
@@ -120,6 +142,7 @@ class DictionaryScanMatches : public IScanMatches {
         void RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long from, unsigned long long to);
         void RecordMatch(uint16_t dictionaryId, uint16_t itemId, unsigned long long to);
 
+        // TODO: Cater for disabled matches
         Match* GetFirstMatch(size_t& idx) {
             idx = 0;
             return GetNextMatch(idx);
@@ -160,6 +183,7 @@ class DictionaryScanMatches : public IScanMatches {
             return ret;
         }
 
+        // TODO: Cater for disabled matches
         size_t GetMatchCount(uint16_t did) const {
             auto it = dictionariesMatchIndx_.find(did);
             if (it == dictionariesMatchIndx_.end()) {
