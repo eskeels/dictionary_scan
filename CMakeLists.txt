@@ -7,12 +7,13 @@ link_directories(.)
 
 include_directories(./verifications)
 
+# https://github.com/JuliaStrings/utf8proc
 include_directories(${CMAKE_SOURCE_DIR}/../utf8proc)
 link_directories(${CMAKE_SOURCE_DIR}/../utf8proc/build)
-
+# https://github.com/google/googletest
 include_directories(${CMAKE_SOURCE_DIR}/../googletest/googletest/include)
 link_directories(${CMAKE_SOURCE_DIR}/../googletest/build/lib)
-
+# https://github.com/intel/hyperscan.git
 include_directories(${CMAKE_SOURCE_DIR}/../hyperscan/src)
 link_directories(${CMAKE_SOURCE_DIR}/../hyperscan/lib)
 
