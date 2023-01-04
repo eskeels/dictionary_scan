@@ -71,6 +71,11 @@ target_link_libraries(ut_verification ${TEST_LIBS})
 add_dependencies(ut_verification dictionary_scanner)
 add_test(NAME ut_verification COMMAND ut_verification)
 
+add_executable(ut_dictionaryscanner_proximity ut/ut_dictionaryscanner_proximity.cpp gmain.cpp)
+target_link_libraries(ut_dictionaryscanner_proximity ${TEST_LIBS})
+add_dependencies(ut_dictionaryscanner_proximity dictionary_scanner)
+add_test(NAME ut_dictionaryscanner_proximity COMMAND ut_dictionaryscanner_proximity)
+
 add_executable(dictionaryscanner tools/main.cpp)
 target_link_libraries(dictionaryscanner libdictionary_scanner.a utf8proc hs)
 add_dependencies(dictionaryscanner dictionary_scanner)

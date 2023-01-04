@@ -192,20 +192,3 @@ TEST (DictionaryOneItemZeroTotalScore, AllDefault) {
     EXPECT_EQ(0, totalScore);
 }
 
-TEST (DictionaryProximityTwoItems, AllDefault) {
-    DLP::Dictionaries ds;
-    AddProximityDictionary( ds, "words", 1 , { "sat",  "the" }, LITERAL, 8);
-
-    std::string txt = "the cat sat";
-    DLP::DictionaryScanMatches dsm = Scan(ds, txt, 1);
-    std::vector<std::string> snippets;
-    dsm.CreateMatchSnippets({}, true, 10, 3, snippets, nullptr);
-    std::cout << "Score is " << dsm.GetScore(1) << std::endl;
-
-    for( auto s : snippets ) {
-        std::cout << s << std::endl;
-    }
- 
-}
-
-

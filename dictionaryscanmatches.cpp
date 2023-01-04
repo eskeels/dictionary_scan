@@ -73,6 +73,13 @@ void DictionaryScanMatches::RecordScore(const Match& match, uint16_t dictionaryI
     }
 }
 
+void DictionaryScanMatches::RecordProximityScore(Match& m1, Match& m2, uint16_t dictionaryId) {
+    RecordScore(m1, dictionaryId);
+    RecordScore(m2, dictionaryId);
+    m1.SetProximityMatch();
+    m2.SetProximityMatch();
+}
+
 std::string DictionaryScanMatches::GetSnippet(const Match& match, size_t affix) {
     size_t startPos = 0;
     size_t endPos = match.GetTo();
@@ -118,13 +125,14 @@ void DictionaryScanMatches::CreateMatchSnippets(const std::set<uint16_t>& dictio
             auto& matches = d->second;
             for (size_t i=0; (i <= count) && (i < matches.size()) && (snippets.size() <= count) ; ++i) {
                 auto& match = matches_[matches[i]];
-                // TODO: Ignore disabled matches
                 if (pcontext == nullptr || (pcontext != nullptr && match.GetContext() == *pcontext)) {
-                    std::string s = GetSnippet(match, affix);
-                    if (!s.empty()) {
-                        snippets.push_back(std::move(s));
+                    if (!match.IsDisabled()) {
+                        std::string s = GetSnippet(match, affix);
+                        if (!s.empty()) {
+                            snippets.push_back(std::move(s));
+                        }
+                        std::cout << match.GetFrom() << " " <<  match.GetTo() << std::endl;
                     }
-                    std::cout << match.GetFrom() << " " <<  match.GetTo() << std::endl;
                 }
             }
         }
@@ -228,8 +236,11 @@ void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
     if (match.IsProximity()) {
         // This should be a function
         std::cout << "Got proximity " << match.GetItemId() << std::endl;
-        proximityMatches_.push_back(match);
+//        proximityMatches_.push_back(match);
         matchedProximities_.insert(std::make_pair(dictionaryId,match.GetProximityId()));
+        // Proximity matches make match count incorrect
+        // as there could be disabled matches
+        haveProximityMatch_ = true;
     } else {
         // ignore score for now
         RecordScore(match, dictionaryId);
@@ -242,6 +253,11 @@ void DictionaryScanMatches::RecordMatch(Match&& match, uint16_t dictionaryId) {
     }
     matches_.push_back(match);
     uint32_t idx = (uint32_t)matches_.size()-1;
+
+    // match was from a proximity so record the index
+    if (match.IsProximity()) {
+        proxMatchIdx_.push_back(idx);
+    }
 
     auto it = dictionariesMatchIndx_.find(dictionaryId);
     if (it == dictionariesMatchIndx_.end()) {
@@ -277,7 +293,9 @@ void DictionaryScanMatches::RecordMatch(uint16_t dictionaryId, uint16_t itemId, 
 }
 
 void DictionaryScanMatches::ResolveProximity() {
-    if (!proximityMatches_.empty()) {
+//    if (!proximityMatches_.empty()) {
+    if (!proxMatchIdx_.empty()) {
+
        // need to find all the matches for the same proximityId and dictionaryId
 
         // - Iterate  matchedProximities_
@@ -286,13 +304,19 @@ void DictionaryScanMatches::ResolveProximity() {
             const uint16_t dictionaryId = mp.first;
             const uint16_t proximityId = mp.second;
             // - for each pair, iterate proximityMatches_ and collate a list
-            for (size_t lp = 0 ; lp < proximityMatches_.size() ; ++lp) {
-                Match* proxMatch = &proximityMatches_[lp];
-                //   of matches for that dictionary / proximity
-                if (proxMatch->GetDictionaryId() == dictionaryId 
-                    && proxMatch->GetProximityId() == proximityId) {
-                    std::cout << "Adding match " << proxMatch << " " << proxMatch->GetDictionaryId() << " " << proxMatch->GetItemId() << std::endl;
-                    relatedMatches.push_back(proxMatch);
+//            for (size_t lp = 0 ; lp < proximityMatches_.size() ; ++lp) {
+//                Match* proxMatch = &proximityMatches_[lp];
+            for (size_t lp = 0 ; lp < proxMatchIdx_.size() ; ++lp) {
+                uint32_t proxMatchIdx = proxMatchIdx_[lp];
+                // in case we hit the match limit
+                if (proxMatchIdx < matches_.size()) {
+                    Match* proxMatch = &matches_[proxMatchIdx_[lp]]; 
+                    //   of matches for that dictionary / proximity
+                    if (proxMatch->GetDictionaryId() == dictionaryId 
+                        && proxMatch->GetProximityId() == proximityId) {
+                        std::cout << "Adding match " << proxMatch << " " << proxMatch->GetDictionaryId() << " " << proxMatch->GetItemId() << std::endl;
+                        relatedMatches.push_back(proxMatch);
+                    }
                 }
             }
             auto dict = dictionaries_->GetDictionary(dictionaryId);
@@ -319,10 +343,13 @@ void DictionaryScanMatches::ResolveProximity() {
                     }
                     if (relatedMatches[i]->IsProximityMatch(*relatedMatches[j], distance)) {
                         std::cout << "Got proximity match" << std::endl;
+                        RecordProximityScore(*relatedMatches[i], *relatedMatches[j], dictionaryId);
+                        /*
                         RecordScore(*relatedMatches[i], dictionaryId);
                         RecordScore(*relatedMatches[j], dictionaryId);
                         relatedMatches[i]->SetProximityMatch();
                         relatedMatches[j]->SetProximityMatch();
+                        */
                         break;
                     } else {
                         std::cout << "Proximity DIDNT match" << std::endl;
@@ -331,12 +358,22 @@ void DictionaryScanMatches::ResolveProximity() {
             }
         }
         // - any leftover matches should be removed from match list (or reset to avoid re-alloc)
-        for(auto& pm : proximityMatches_) {
+/*        for(auto& pm : proximityMatches_) {
             if (!pm.IsProximityMatch()) {
                 pm.DisableMatch();
             }
-        }
+        }*/
 
+        // Go throufh list of proximityMatches. If any are NOT
+        // flagged as being an actual proximity match then
+        // disabled it from the original match list
+        for (size_t lp = 0 ; lp < proxMatchIdx_.size() ; ++lp) {
+            Match* proxMatch = &matches_[proxMatchIdx_[lp]]; 
+            if (!proxMatch->IsProximityMatch()) {
+                proxMatch->DisableMatch();
+                ++disabledMatches_;
+            }
+        } 
     }
 }
 

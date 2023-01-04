@@ -160,8 +160,7 @@ class DictionaryScanMatches : public IScanMatches {
         }
 
         size_t GetMatchCount() const {
-            // TODO: Cater for disabled matches
-            return matches_.size();
+            return matches_.size() - disabledMatches_;
         }
 
         Match* GetFirstMatch(size_t& idx, uint16_t did) {
@@ -212,6 +211,7 @@ class DictionaryScanMatches : public IScanMatches {
     protected:
         void RecordMatch(Match&& match, uint16_t dictionaryId);
         void RecordScore(const Match& match, uint16_t dictionaryId);
+        void RecordProximityScore(Match& m1, Match& m2, uint16_t dictionaryId);
         bool CheckDistinct(const Match& match, uint16_t dictionaryId);
         bool CheckOverlap(const Match& match, uint16_t dictionaryId);
         bool CheckPartial(const Match& match);
@@ -223,7 +223,9 @@ class DictionaryScanMatches : public IScanMatches {
         const char* input_ = nullptr;
         size_t len_ = 0;
         std::vector<Match> matches_;
-        std::vector<Match> proximityMatches_;
+//        std::vector<Match> proximityMatches_;
+        // index into matches_
+        std::vector<uint32_t> proxMatchIdx_;
 
         // dictionary id to offset in matches_ index. So we can
         // find all matches for a dictionary
@@ -249,5 +251,10 @@ class DictionaryScanMatches : public IScanMatches {
         std::set<std::tuple<size_t,uint16_t,uint16_t>> matchesInOverlap_;
         // limit on number of matches
         size_t matchLimit_ = 100000;
+        // whether there was any proximity matches
+        bool haveProximityMatch_ = false;
+        // count of disabled matches (total
+        // accross all dictionaries)
+        size_t disabledMatches_ = 0;
 };
 }
