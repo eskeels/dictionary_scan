@@ -85,6 +85,7 @@ class Match {
         bool IsProximityMatch(const Match& rhs, uint8_t distance) const {
             // ignore existing matches
             if (IsProximityMatch() || rhs.IsProximityMatch()) {
+                std::cout << "Ignore existing prox" << std::endl;
                 return false;
             }
 
@@ -99,6 +100,7 @@ class Match {
             if (md <= distance) {
                 return true;
             }
+            std::cout << "md is " << md << " distance is " << (int)distance << std::endl;
             return false;    
         }
 

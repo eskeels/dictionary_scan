@@ -59,7 +59,7 @@ class Literal : public DictionaryItem {
                 bool caseSensitive,
                 uint16_t id,
                 std::string regex,
-                bool proximity) : DictionaryItem(score,distinct,partial,caseSensitive,id,regex,proximity)
+                uint16_t proximity) : DictionaryItem(score,distinct,partial,caseSensitive,id,regex,proximity)
         {
         }
 
@@ -76,7 +76,7 @@ class Regex : public DictionaryItem {
               uint16_t id,
               uint16_t verificationId,
               std::string regex,
-              bool proximity) : DictionaryItem(score,distinct,partial,caseSensitive,id,regex,proximity)
+              uint16_t proximity) : DictionaryItem(score,distinct,partial,caseSensitive,id,regex,proximity)
         {
             verificationId_ = verificationId;
         }

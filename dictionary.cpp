@@ -15,14 +15,20 @@ uint16_t Dictionary::Add(const IDictionaryItem* item) {
 }
 
 uint16_t Dictionary::AddLiteralProximity(std::vector<const IDictionaryItem*> items, uint8_t distance) {
+std::cout << "In AddLiteralProximity" << std::endl;
     std::vector<uint16_t> itemIds;
+
+    uint16_t proximityId = GetLiteralProximityId();
     for (auto di : items) {
         if (!di->IsProximity()) {
-            std::cerr << "ERROR: Proximity flag not set!" << std::endl;
+            std::cout << "ERROR: Proximity flag not set!" << std::endl;
+        }
+        else if (di->GetProximityId() != proximityId){
+            std::cout << "ERROR: ID IS mismatched" << di->GetProximityId() << std::endl;
         }
         itemIds.push_back(Add(di));
     }
-    uint16_t proximityId = proximityCount_;
+//    uint16_t proximityId = proximityCount_;
     proximityItems_.insert(std::make_pair(proximityId, itemIds));
     proximityDistance_.insert(std::make_pair(proximityId, distance));
     ++proximityCount_;

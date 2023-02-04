@@ -34,6 +34,13 @@ class Dictionary {
                 return it->second;
             }
             return 0;
+        }
+        // These are fixed, any value is fine
+        uint16_t GetLiteralProximityId() const {
+            return 7;
+        }
+        uint16_t GetRegexProximityId() const {
+            return 9;
         }    
     protected:
         // all the items in this dictionary

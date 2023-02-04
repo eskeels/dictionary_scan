@@ -84,9 +84,11 @@ void AddProximityDictionary( DLP::Dictionaries& ds,
     std::vector<const IDictionaryItem*> proxItems;
     for ( auto& t : terms ) {
         if (ttype == LITERAL) {
-            proxItems.push_back(ifactory.CreateLiteral(t,nullptr,nullptr,nullptr,nullptr,true));
+            auto item = ifactory.CreateLiteral(t,nullptr,nullptr,nullptr,nullptr,d->GetLiteralProximityId());
+            std::cout << "Proximity ID is " << item->GetProximityId() << std::endl;
+            proxItems.push_back(item);
         } else {
-            proxItems.push_back(ifactory.CreateRegex(t,nullptr,nullptr,nullptr,nullptr,true));
+            proxItems.push_back(ifactory.CreateRegex(t,nullptr,nullptr,nullptr,nullptr,d->GetRegexProximityId()));
         }
     }
 

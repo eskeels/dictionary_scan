@@ -16,6 +16,8 @@ namespace DLP {
         protected:
             void ProcessFlags(const std::string& flags, bool& distinct, bool& partial, bool& caseSensitive) const;
             void ParseLiterals(const json11::Json& literals, DictionaryItemFactory& factory, Dictionary* dictionary); 
+            void ParseLiterals(const json11::Json& literals, DictionaryItemFactory& factory, uint16_t proximityId, std::vector<const IDictionaryItem*>& items); 
+            void ParseProximityLiterals(const json11::Json& literals, uint8_t distance, DictionaryItemFactory& factory, Dictionary* dictionary); 
             void ParseRegexes(const json11::Json& regexes, DictionaryItemFactory& factory, Dictionary* dictionary); 
             void ParseDictionaryAttributes(const json11::Json& jDic, std::string& name, uint16_t& dictionaryId, uint16_t& revision);
 

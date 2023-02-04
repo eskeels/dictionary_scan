@@ -25,6 +25,41 @@ namespace DLP {
             } 
         }
     }
+    
+    void DictionaryJSONParser::ParseLiterals(const json11::Json& literals, DictionaryItemFactory& factory, uint16_t proximityId, std::vector<const IDictionaryItem*>& items) {
+        for( auto literal : literals.array_items()) {
+            if (literal.is_object()) {
+                std::string val = literal["v"].string_value();
+                if (!val.empty()) {
+                    // get 'f' : c = case sensitive (else insensitive), d = distinct (else non distinct), p = partial (else whole)
+                    std::string flags = literal["f"].string_value();
+                    bool distinct = false;
+                    bool partial = false;
+                    bool caseSensitive = false;
+                    ProcessFlags(flags, distinct, partial, caseSensitive);
+                    // get 's' : score
+                    int16_t score = literal["s"].int_value();
+                    if (score == 0) {
+                        score = 10;
+                    }
+                    const IDictionaryItem* item = factory.CreateLiteral(val, &score, &distinct, &partial, &caseSensitive, proximityId);
+                    items.push_back(item);
+                }
+            } else {
+                std::string val = literal.string_value();
+                if (!val.empty()) {
+                    const IDictionaryItem* item = factory.CreateLiteral(val, nullptr, nullptr, nullptr, nullptr, proximityId);
+                    items.push_back(item);
+                }
+            }
+        }
+    }
+
+    void DictionaryJSONParser::ParseProximityLiterals(const json11::Json& literals, uint8_t distance, DictionaryItemFactory& factory, Dictionary* dictionary) {
+        std::vector<const IDictionaryItem*> items;
+        ParseLiterals(literals, factory, dictionary->GetLiteralProximityId(), items);
+        dictionary->AddLiteralProximity(items, distance);
+    } 
 
     void DictionaryJSONParser::ParseLiterals(const json11::Json& literals, DictionaryItemFactory& factory, Dictionary* dictionary) {
         for( auto literal : literals.array_items()) {
@@ -120,6 +155,17 @@ namespace DLP {
                     ParseLiterals(jDic["literals"], factory, dictionary);
                     ParseRegexes(jDic["regexes"], factory, dictionary);
 
+                    uint8_t distance = 0;
+                    auto lpd = jDic["literal_proximity_distance"];
+                    if (!lpd.is_null()) {
+                        distance = lpd.int_value();
+                    }
+
+                    if (distance == 0) {
+                        distance = 10;
+                    }
+                    ParseProximityLiterals(jDic["proximity_literals"], distance, factory, dictionary);
+std::cout << "DISTANCE IS i" << (int)distance << std::endl;
                     dictionaries.Add(dictionary);
                 }
             }
